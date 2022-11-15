@@ -10,4 +10,4 @@
 
 **🍈[个人博客](http://www.littlelion.cloud/)**
 
-**🍇[学习书籍](https://gitee.com/tonghuihuang/book.git)**
+**🍇[学习书籍](https://gitee.com/tonghuihuang/java-books)**
