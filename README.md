@@ -9,7 +9,7 @@
 ```
 
 ****
-**🍈[个人博客](http://www.littlelion.cloud/) 🍇[个人书籍](https://gitee.com/tonghuihuang/java-books)**
+**🍈[个人博客](http://www.littlelion.cloud/) 🍇[学习书籍](https://gitee.com/tonghuihuang/java-books)**
 ****
 <font color=Darkorange>**个人信息**</font>
 
