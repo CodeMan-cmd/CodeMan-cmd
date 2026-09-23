@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>浅色变体 &lt;img&gt; 渲染验证</title>
+<!--
+  为什么需要单独验证：
+    1. prefers-color-scheme 无法用 JS 覆盖，所以"切到浅色主题看效果"这条路走不通；
+    2. 更重要的是：GitHub 渲染仓库里的 SVG 走的是 <img> 语义，而不是内联 SVG。
+       两者有实质差别 —— <img> 模式下 SVG 内部的脚本被禁用、外部资源不加载、
+       依赖的字体必须能被系统解析。用内联 SVG 验证会漏掉这些坑。
+    3. 因此这里把每个 light 变体当作 <img src> 真正加载一次，检查：
+       · 是否成功解码（naturalWidth > 0）
+       · 渲染出的位图是否非空白（逐像素采样，防止"图能加载但内容是空白"）
+  -->
+</head>
+<body style="background:#fff;color:#1f2328;font-family:monospace;margin:0;padding:16px">
+<h3 style="font-size:13px;color:#59636e">浅色变体（以 &lt;img&gt; 方式加载，与 GitHub 一致）</h3>
+<div id="root"></div>
+<script id="img-verifier">
+const FILES = [
+  'banner.svg', 'stats.svg', 'activity.svg', 'stack.svg',
+  'banner-light.svg', 'stats-light.svg', 'activity-light.svg', 'stack-light.svg',
+];
+const report = [];
+
+/** 逐像素采样：判断渲染结果是否"几乎全空白"（即内容没画出来） */
+function sampleCanvas(img, file) {
+  const isLight = file.includes('-light');
+  // 底色随主题变化：浅色卡底色为白，深色卡底色为 #0d1117
+  const base = isLight ? [255, 255, 255] : [13, 17, 23];
+  const c = document.createElement('canvas');
+  const w = Math.min(600, img.naturalWidth);
+  const h = Math.min(400, img.naturalHeight);
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;
+  let opaque = 0, colored = 0;
+  const total = w * h;
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
+    if (a > 200) opaque++;
+    // 与底色差异明显的像素算作"有内容"
+    if (a > 200 && (Math.abs(r - base[0]) > 24 || Math.abs(g - base[1]) > 24 || Math.abs(b - base[2]) > 24)) colored++;
+  }
+  return { total, opaquePct: +(opaque / total * 100).toFixed(1), contentPct: +(colored / total * 100).toFixed(1) };
+}
+
+async function run() {
+  const root = document.getElementById('root');
+  for (const f of FILES) {
+    const wrap = document.createElement('div');
+    wrap.style.marginBottom = '18px';
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:12px;color:#59636e;margin-bottom:4px';
+    label.textContent = f;
+    const img = document.createElement('img');
+    img.src = '/assets/' + f;
+    img.style.cssText = 'display:block;max-width:100%;outline:1px solid #d0d7de';
+    wrap.append(label, img);
+    root.appendChild(wrap);
+
+    await new Promise((res) => {
+      if (img.complete) return res();
+      img.addEventListener('load', res, { once: true });
+      img.addEventListener('error', res, { once: true });
+      setTimeout(res, 15000);
+    });
+
+    if (!img.naturalWidth) {
+      report.push({ file: f, ok: false, reason: '解码失败（naturalWidth=0）' });
+      continue;
+    }
+    const s = sampleCanvas(img, f);
+    report.push({
+      file: f,
+      ok: s.contentPct > 1.5,
+      natural: `${img.naturalWidth}×${img.naturalHeight}`,
+      ...s,
+      reason: s.contentPct > 1.5 ? '内容正常' : '画面几乎空白，疑似未绘制',
+    });
+  }
+  window.__IMG_REPORT__ = report;
+  console.log('IMG_REPORT ' + JSON.stringify(report));
+}
+run().catch((e) => { window.__IMG_REPORT__ = { error: e.message }; console.log('IMG_REPORT_ERROR ' + e.message); });
+</script>
+</body>
+</html>

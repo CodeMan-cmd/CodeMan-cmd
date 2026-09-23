@@ -1,0 +1,5 @@
+# 本地预览 / 调试产物
+.browser-mode/
+*.log
+.DS_Store
+Thumbs.db
