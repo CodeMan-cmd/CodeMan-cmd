@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>SMIL 动画活性验证</title>
+<!--
+  为什么需要这个页面：
+    写了 <animate> 不代表动画真的在跑 —— 属性名写错、attributeName 拼错、
+    target 元素不存在、calcMode/keySplines 不合法，都会让 SMIL 静默失效
+    （不报错、不警告，只是不动）。肉眼盯一屏也未必看得出。
+  这里改用**采样**判定：对每个被动画的属性，在不同时间点读取其真实计算值，
+  只要值发生变化就证明动画在跑。
+-->
+</head>
+<body style="margin:0;padding:16px;background:#222;color:#eee;font-family:monospace">
+<div id="root"></div>
+<script id="smil-checker">
+const FILES = [
+  'anim-scan.svg', 'anim-glow.svg', 'anim-pulse.svg',
+  'anim-scan-light.svg', 'anim-glow-light.svg', 'anim-pulse-light.svg',
+];
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function run() {
+  const root = document.getElementById('root');
+  const report = [];
+
+  for (const file of FILES) {
+    const svgText = await (await fetch('/assets/' + file, { cache: 'no-store' })).text();
+    const holder = document.createElement('div');
+    holder.style.cssText = 'margin-bottom:24px;outline:1px solid #444';
+    holder.innerHTML = svgText;
+    root.appendChild(holder);
+
+    const svg = holder.querySelector('svg');
+    const anims = [...svg.getElementsByTagName('animate')];
+
+    // 收集被动画的目标元素与属性名
+    const targets = anims.map((a) => ({
+      el: a.parentElement,
+      attr: a.getAttribute('attributeName'),
+      dur: a.getAttribute('dur'),
+      values: a.getAttribute('values'),
+    }));
+
+    const read = () =>
+      targets.map((t) => {
+        if (!t.el) return null;
+        const v = t.el.getAttribute(t.attr);
+        return v === null ? null : String(v);
+      });
+
+    const samples = [];
+    for (let i = 0; i < 5; i++) {
+      samples.push(read());
+      await sleep(320);
+    }
+
+    // 判定：至少一个属性在采样期间发生过变化
+    const changedAttrs = [];
+    for (let k = 0; k < targets.length; k++) {
+      const vals = samples.map((s) => s[k]).filter((v) => v !== null);
+      const uniq = new Set(vals);
+      if (uniq.size > 1) changedAttrs.push(`${targets[k].attr}(${[...uniq].slice(0, 3).join('→')}…)`);
+    }
+
+    report.push({
+      file,
+      animateCount: anims.length,
+      liveCount: changedAttrs.length,
+      live: changedAttrs.slice(0, 4),
+      ok: anims.length > 0 && changedAttrs.length > 0,
+    });
+  }
+
+  window.__SMIL_REPORT__ = report;
+  console.log('SMIL_REPORT ' + JSON.stringify(report));
+}
+
+run().catch((e) => {
+  window.__SMIL_REPORT__ = { error: e.message };
+  console.log('SMIL_REPORT_ERROR ' + e.message);
+});
+</script>
+</body>
+</html>

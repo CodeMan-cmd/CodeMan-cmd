@@ -27,6 +27,19 @@
   </picture>
 </div>
 
+<!-- 动画状态条：扫描光标在终端里循环扫过 + 底部进度条同步伸缩。
+     用 SMIL（<animate>）实现。选它的依据是实测（tools/probe-animation.mjs）：
+     GitHub 上被大量主页使用、确认会动的 readme-typing-svg 服务，其动画正是
+     SMIL + 字体以 data URI 内嵌。因此跟随这个已知可行的机制，而不是自己发明。
+     本文件在浏览器中的动画活性已用 tools/../preview/smil-check.html 采样验证过。
+     注意：动画 SVG 刻意不画背景矩形，保持透明以融入深浅两种主题。 -->
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="./assets/anim-scan-light.svg">
+    <img src="./assets/anim-scan.svg" alt="扫描动画状态条" width="100%">
+  </picture>
+</div>
+
 <div align="center">
   <a href="https://github.com/CodeMan-cmd"><img src="https://img.shields.io/badge/GitHub-CodeMan--cmd-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
   <a href="mailto:2291415248@qq.com"><img src="https://img.shields.io/badge/Email-2291415248%40qq.com-6D4AFF?style=for-the-badge&logo=maildotru&logoColor=white" alt="Email"></a>
@@ -62,6 +75,21 @@ public final class CodeMan {
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="./assets/stats-light.svg">
     <img src="./assets/stats.svg" alt="GitHub 数据概览" width="100%">
+  </picture>
+</div>
+
+<!-- 流水灯分隔线：三个节点依次点亮，给统计区之间一个呼吸节奏 -->
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="./assets/anim-glow-light.svg">
+    <img src="./assets/anim-glow.svg" alt="辉光呼吸分隔线" width="100%">
+  </picture>
+</div>
+
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="./assets/anim-pulse-light.svg">
+    <img src="./assets/anim-pulse.svg" alt="实时状态点" width="100%">
   </picture>
 </div>
 

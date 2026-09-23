@@ -93,9 +93,14 @@ function checkSvgWellFormed(text) {
   if (!/^\s*<svg[\s>]/i.test(text.replace(/^<\?xml[^>]*\?>\s*/, ''))) errs.push('根元素不是 <svg>');
   if (!/<\/svg>\s*$/i.test(text)) errs.push('缺少闭合的 </svg>');
 
-  // 标签配对检查（SVG 里没有 CDATA 嵌套的复杂情况，按标签名栈匹配足够可靠）
+  // 标签配对检查。
+  // 关键细节：不能预设某些元素"永远是自闭合"。例如 <rect> / <circle> 通常写成
+  // <rect ... />，但只要它们内部嵌了动画子元素（<animate>），就**必须**写成
+  // <rect ...>...</rect>。早期版本把这些名字放进 selfClosing 白名单，
+  // 结果把合法的动画 SVG 全部误报成"标签不匹配"——这类误报很危险，
+  // 会让人以为文件坏了而把好文件改坏。
+  // 正确判定：看标签自身是否以 "/>" 结尾——是则自闭合，否则必须配对。
   const stack = [];
-  const selfClosing = new Set(['br', 'img', 'hr', 'path', 'rect', 'circle', 'line', 'stop', 'use', 'polygon', 'polyline', 'ellipse', 'feGaussianBlur', 'feMergeNode']);
   const tagRe = /<\/?([A-Za-z][\w:-]*)((?:[^>"']|"[^"]*"|'[^']*')*?)(\/?)>/g;
   let m;
   while ((m = tagRe.exec(text))) {
@@ -103,7 +108,7 @@ function checkSvgWellFormed(text) {
     if (full.startsWith('</')) {
       const top = stack.pop();
       if (top !== name) errs.push(`标签不匹配：</${name}> 对应的是 <${top || '空'}>`);
-    } else if (!slash && !selfClosing.has(name)) {
+    } else if (!slash) {
       stack.push(name);
     }
   }
