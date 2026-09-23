@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>SVG 几何自检</title>
+<!--
+  为什么需要这个页面：
+    本项目运行在纯文本模型下，无法"看"截图。因此改为把每张 SVG 内联进 DOM，
+    逐元素测量 getBBox()，用几何数据判断：
+      · 文本是否超出画布（截断 / 出血）
+      · 文本是否互相重叠（排版塌陷）
+      · 是否因为估算宽度偏小而被容器裁掉
+    这比肉眼看截图更严格：肉眼很难发现 1-2px 的溢出，而数据可以。
+  结果通过 console.log('GEO_REPORT ...') 输出，由外部驱动读取。
+-->
+<style>
+  body { background: #0d1117; color: #e6edf3; font-family: monospace; margin: 0; padding: 16px; }
+  .case { margin-bottom: 28px; }
+  .case h3 { font-size: 13px; color: #8b949e; margin: 0 0 6px; }
+  .wrap { position: relative; display: inline-block; outline: 1px dashed #30363d; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script id="geo-checker">
+const FILES = [
+  'banner.svg', 'stats.svg', 'activity.svg', 'stack.svg',
+  'banner-light.svg', 'stats-light.svg', 'activity-light.svg', 'stack-light.svg',
+];
+
+async function run() {
+  const root = document.getElementById('root');
+  const report = [];
+
+  for (const file of FILES) {
+    const svgText = await (await fetch('/assets/' + file, { cache: 'no-store' })).text();
+
+    const caseEl = document.createElement('div');
+    caseEl.className = 'case';
+    caseEl.innerHTML = `<h3>${file}</h3>`;
+    const wrap = document.createElement('div');
+    wrap.className = 'wrap';
+    wrap.innerHTML = svgText;
+    caseEl.appendChild(wrap);
+    root.appendChild(caseEl);
+
+    const svg = wrap.querySelector('svg');
+    const vb = svg.getAttribute('viewBox');
+    const [vx, vy, vw, vh] = vb.split(/\s+/).map(Number);
+
+    const texts = [...svg.getElementsByTagName('text')];
+    const items = [];
+    let overflowX = 0, overflowY = 0;
+
+    for (const t of texts) {
+      let bb;
+      try { bb = t.getBBox(); } catch { continue; }
+      const content = (t.textContent || '').trim();
+      if (!content) continue;
+
+      const right = bb.x + bb.width;
+      const bottom = bb.y + bb.height;
+      const overR = right > vx + vw ? right - (vx + vw) : 0;
+      const overB = bottom > vy + vh ? bottom - (vy + vh) : 0;
+      const overL = vx - bb.x > 0 ? vx - bb.x : 0;
+      if (Math.max(overR, overL) > 0.5) overflowX++;
+      if (overB > 0.5) overflowY++;
+
+      items.push({
+        text: content.length > 34 ? content.slice(0, 34) + '…' : content,
+        x: Math.round(bb.x), y: Math.round(bb.y),
+        w: Math.round(bb.width), h: Math.round(bb.height),
+        overR: Math.round(overR), overB: Math.round(overB), overL: Math.round(overL),
+      });
+    }
+
+    // 重叠检测：同行且 x 区间相交、y 区间也相交
+    const overlaps = [];
+    for (let a = 0; a < items.length; a++) {
+      for (let b = a + 1; b < items.length; b++) {
+        const A = items[a], B = items[b];
+        const xOverlap = Math.min(A.x + A.w, B.x + B.w) - Math.max(A.x, B.x);
+        const yOverlap = Math.min(A.y + A.h, B.y + B.h) - Math.max(A.y, B.y);
+        if (xOverlap > 2 && yOverlap > 2) {
+          overlaps.push(`${A.text} ⇄ ${B.text} (${xOverlap}×${yOverlap}px)`);
+        }
+      }
+    }
+
+    report.push({
+      file,
+      viewBox: vb,
+      canvas: `${vw}×${vh}`,
+      textCount: texts.length,
+      overflowXcount: overflowX,
+      overflowYcount: overflowY,
+      overlaps,
+      // 只列出可疑项，避免报告过长
+      problems: items.filter((t) => t.overR > 0.5 || t.overB > 0.5 || t.overL > 0.5),
+    });
+  }
+
+  window.__GEO_REPORT__ = report;
+  console.log('GEO_REPORT ' + JSON.stringify(report));
+}
+
+run().catch((e) => {
+  window.__GEO_REPORT__ = { error: e.message };
+  console.log('GEO_REPORT_ERROR ' + e.message);
+});
+</script>
+</body>
+</html>

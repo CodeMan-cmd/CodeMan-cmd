@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="232" viewBox="0 0 1200 232" role="img" aria-label="技术栈">
+  <rect width="1200" height="232" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+
+  <g>
+    <circle cx="40" cy="36" r="5.5" fill="#8250df"/>
+    <text x="58" y="41" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" fill="#1f2328" letter-spacing="1">TECH STACK</text>
+    <text x="1166" y="41" text-anchor="end" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#59636e">依据上游贡献与仓库语言归纳</text>
+  </g>
+  <line x1="34" y1="56" x2="1166" y2="56" stroke="#d0d7de" stroke-width="1"/>
+
+  <g>
+    <text x="34" y="92" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#0969da" letter-spacing="1.2">LANGUAGES</text>
+    <g>
+      <rect x="34" y="104" width="56" height="26" rx="6" fill="#f6f8fa" stroke="#0969da" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="47" y="121.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">Java</text>
+    </g>
+    <g>
+      <rect x="34" y="138" width="105" height="26" rx="6" fill="#f6f8fa" stroke="#0969da" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="47" y="155.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">Spring Boot</text>
+    </g>
+    <g>
+      <rect x="34" y="172" width="140" height="26" rx="6" fill="#f6f8fa" stroke="#0969da" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="47" y="189.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">Spring Framework</text>
+    </g>
+    <g>
+      <rect x="34" y="206" width="63" height="26" rx="6" fill="#f6f8fa" stroke="#0969da" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="47" y="223.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">MySQL</text>
+    </g>
+  </g>
+  <g>
+    <text x="321" y="92" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#8250df" letter-spacing="1.2">FRAMEWORKS &amp; DATA</text>
+    <g>
+      <rect x="321" y="104" width="63" height="26" rx="6" fill="#f6f8fa" stroke="#8250df" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="334" y="121.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">Redis</text>
+    </g>
+    <g>
+      <rect x="321" y="138" width="63" height="26" rx="6" fill="#f6f8fa" stroke="#8250df" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="334" y="155.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">Maven</text>
+    </g>
+  </g>
+  <g>
+    <text x="608" y="92" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#9a6700" letter-spacing="1.2">FOCUS</text>
+    <g>
+      <rect x="608" y="104" width="98" height="26" rx="6" fill="#f6f8fa" stroke="#9a6700" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="621" y="121.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">Apache POI</text>
+    </g>
+    <g>
+      <rect x="608" y="138" width="91" height="26" rx="6" fill="#f6f8fa" stroke="#9a6700" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="621" y="155.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">EasyExcel</text>
+    </g>
+    <g>
+      <rect x="608" y="172" width="63" height="26" rx="6" fill="#f6f8fa" stroke="#9a6700" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="621" y="189.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">Fesod</text>
+    </g>
+  </g>
+  <g>
+    <text x="895" y="92" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#1a7f37" letter-spacing="1.2">ALSO</text>
+    <g>
+      <rect x="895" y="104" width="76" height="26" rx="6" fill="#f6f8fa" stroke="#1a7f37" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="908" y="121.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">流式读写</text>
+    </g>
+    <g>
+      <rect x="895" y="138" width="80" height="26" rx="6" fill="#f6f8fa" stroke="#1a7f37" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="908" y="155.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">OOM 治理</text>
+    </g>
+    <g>
+      <rect x="895" y="172" width="98" height="26" rx="6" fill="#f6f8fa" stroke="#1a7f37" stroke-width="1" stroke-opacity="0.45"/>
+      <text x="908" y="189.5" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" fill="#1f2328">JavaScript</text>
+    </g>
+  </g>
+</svg>

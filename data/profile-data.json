@@ -1,0 +1,102 @@
+{
+  "_comment": "本文件是 CodeMan-cmd 公开 GitHub 数据的快照，用于离线生成静态 SVG 统计卡。数据来源：GitHub REST API v3（/users, /users/:u/repos, /users/:u/events/public, /search/issues），通过本会话浏览器抓取（浏览器有独立于 Node 的 API 配额）。所有数字均为实测值，未估算。",
+  "fetchedAt": "2026-09-23T02:30:00Z",
+  "source": "https://api.github.com",
+  "profile": {
+    "login": "CodeMan-cmd",
+    "id": 52879329,
+    "name": "Rosemonder",
+    "type": "User",
+    "company": null,
+    "blog": "",
+    "location": null,
+    "email": null,
+    "bio": null,
+    "twitter_username": null,
+    "public_repos": 17,
+    "public_gists": 0,
+    "followers": 1,
+    "following": 2,
+    "created_at": "2019-07-14T08:49:08Z",
+    "html_url": "https://github.com/CodeMan-cmd",
+    "avatar_url": "https://avatars.githubusercontent.com/u/52879329?v=4"
+  },
+  "repoStats": {
+    "total": 17,
+    "own": 6,
+    "fork": 11,
+    "ownRepos": [
+      { "name": "CodeMan-cmd", "role": "profile-readme", "created": "2022-11-15", "sizeKB": 11, "desc": "GitHub 个人主页仓库（profile README）" },
+      { "name": "hot-spot", "role": "project", "lang": "JavaScript", "created": "2024-10-31", "sizeKB": 177, "desc": "热点聚合（JavaScript + HTML + CSS）" },
+      { "name": "Learn", "role": "notes", "created": "2023-03-07", "sizeKB": 0, "desc": "学习笔记占位仓库" },
+      { "name": "books", "role": "notes", "created": "2022-10-22", "sizeKB": 0, "desc": "学习设计模式" },
+      { "name": "README.md", "role": "misc", "created": "2022-11-15", "sizeKB": 0, "desc": "占位仓库" }
+    ],
+    "forks": [
+      { "name": "hutool", "upstream": "chinabugotech/hutool", "pushed": "2026-09-23" },
+      { "name": "fesod", "upstream": "apache/fesod", "pushed": "2026-09-23" },
+      { "name": "easyexcel", "upstream": "alibaba/easyexcel", "pushed": "2024-10-29" },
+      { "name": "SpringBootCodeGenerator", "upstream": "TangSY/SpringBootCodeGenerator", "pushed": "2024-01-29" },
+      { "name": "DesignPattern", "upstream": "lichangke/DesignPattern", "pushed": "2021-04-24" },
+      { "name": "CodexAppInstaller", "upstream": "l1i1/CodexAppInstaller", "pushed": "2026-08-24" },
+      { "name": "colleague-skill", "upstream": "CodeMan-cmd/colleague-skill", "pushed": "2026-06-01" },
+      { "name": "vscode-extension-gyctools", "upstream": "gyc-cn/vscode-extension-gyctools", "pushed": "2023-03-01" },
+      { "name": "cssgridgenerator", "upstream": "sdras/cssgridgenerator", "pushed": "2023-03-23" },
+      { "name": "classassist", "upstream": "unknown", "pushed": "2023-03-08" },
+      { "name": "golden-horse", "upstream": "unknown", "pushed": "2020-06-09" },
+      { "name": "Book", "upstream": "unknown", "pushed": "2020-05-11" }
+    ]
+  },
+  "contributions": {
+    "_comment": "上游开源贡献，均逐条核验（GET /search/issues?q=author:CodeMan-cmd&type=pr）。",
+    "pullRequests": {
+      "_note": "截至 2026-09-23 的真实状态：5 个 open、0 个 merged。不得把 open 描述为已贡献/已接纳。",
+      "total": 8,
+      "open": 5,
+      "merged": 0,
+      "closed": 3,
+      "items": [
+        { "repo": "chinabugotech/hutool", "number": 4330, "title": "修复 FileMagicNumber 的 MP3/DOC matcher 对截断输入抛 ArrayIndexOutOfBoundsException", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/pull/4330" },
+        { "repo": "chinabugotech/hutool", "number": 4327, "title": "修复 Caesar.encode 负偏移量抛异常及非字母表字符被静默损坏", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/pull/4327" },
+        { "repo": "apache/fesod", "number": 1133, "title": "feat: add converters for java.sql.Date / java.sql.Time / java.time.Instant / java.time.YearMonth", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/apache/fesod/pull/1133" },
+        { "repo": "apache/fesod", "number": 1132, "title": "fix: keep the coordinates in a cloned ReadCellData", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/apache/fesod/pull/1132" },
+        { "repo": "apache/fesod", "number": 1130, "title": "fix: filter columns by java field name for camel case field names", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/apache/fesod/pull/1130" },
+        { "repo": "spring-projects/spring-framework", "number": 29223, "title": "Optimization Determine Bean Name From Annotation", "state": "closed", "merged": false, "created": "2022-09-30", "url": "https://github.com/spring-projects/spring-framework/pull/29223" },
+        { "repo": "Azure/AKS", "number": 2973, "title": "Pahealy/2022 05 01 fix", "state": "closed", "merged": false, "created": "2022-05-22", "url": "https://github.com/Azure/AKS/pull/2973" },
+        { "repo": "firstcontributions/first-contributions", "number": 49850, "title": "add tonghuihuang to Contributors list", "state": "merged", "merged": true, "created": "2022-05-22", "url": "https://github.com/firstcontributions/first-contributions/pull/49850" }
+      ]
+    },
+    "issues": [
+      { "repo": "chinabugotech/hutool", "number": 4329, "title": "FileMagicNumber 的 MP3 / DOC matcher 对截断输入抛出 ArrayIndexOutOfBoundsException（重复）", "state": "closed", "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4329" },
+      { "repo": "chinabugotech/hutool", "number": 4328, "title": "FileMagicNumber 的 MP3 / DOC matcher 对截断输入抛出 ArrayIndexOutOfBoundsException", "state": "open", "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4328" },
+      { "repo": "chinabugotech/hutool", "number": 4326, "title": "Caesar.encode() 传入负偏移量抛出 StringIndexOutOfBoundsException，且中文等非字母表字符被静默损坏", "state": "open", "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4326" },
+      { "repo": "apache/fesod", "number": 1131, "title": "[Bug] A cell read into a ReadCellData field loses its row and column index", "state": "open", "created": "2026-09-23", "url": "https://github.com/apache/fesod/issues/1131" },
+      { "repo": "apache/fesod", "number": 1129, "title": "[Bug] Column include/exclude drops or keeps the wrong columns for field names like xRealIp", "state": "open", "created": "2026-09-23", "url": "https://github.com/apache/fesod/issues/1129" }
+    ],
+    "issuesLifetime": {
+      "_note": "含历史 issue，总数 12（2022-05 ~ 2026-09）。",
+      "total": 12,
+      "todayOpen": 4
+    },
+    "upstreams": [
+      { "repo": "apache/fesod", "full": "Apache Fesod", "what": "高性能电子表格读写库（Apache 项目）；已提交 3 个待审 PR", "url": "https://github.com/apache/fesod" },
+      { "repo": "chinabugotech/hutool", "full": "Hutool", "what": "Java 工具类库；已提交 2 个待审 PR 与 2 个缺陷报告", "url": "https://github.com/chinabugotech/hutool" },
+      { "repo": "alibaba/easyexcel", "full": "EasyExcel", "what": "大文件内存友好的 Excel 处理库；Fork 跟进", "url": "https://github.com/alibaba/easyexcel" },
+      { "repo": "spring-projects/spring-framework", "full": "Spring Framework", "what": "2022 年提过从注解推导 Bean 名称的优化（已关闭）", "url": "https://github.com/spring-projects/spring-framework" }
+    ]
+  },
+  "activity": {
+    "_comment": "近 100 条公开事件（GET /users/:u/events/public），窗口 2026-09-18 ~ 2026-09-23。",
+    "eventCount": 17,
+    "windowFrom": "2026-09-18T00:00:00Z",
+    "windowTo": "2026-09-23T02:30:00Z",
+    "types": { "CreateEvent": 3, "IssuesEvent": 5, "ForkEvent": 4, "IssueCommentEvent": 3, "PullRequestEvent": 2 },
+    "activeRepos": ["apache/fesod", "chinabugotech/hutool", "alibaba/easyexcel", "CodeMan-cmd/fesod", "l1i1/CodexAppInstaller"]
+  },
+  "techStack": {
+    "_comment": "依据：fork 目标（hutool / easyexcel / fesod 均为 Java 生态）、上游 PR 语言（Java）、自有仓库 hot-spot（JS/HTML/CSS）、本机工作区（hutool-contrib / easyexcel-work / jdk17）。",
+    "core": ["Java", "Spring Boot", "Spring Framework", "MySQL", "Redis", "Maven"],
+    "focus": ["Apache POI", "EasyExcel", "Fesod", "流式读写", "OOM 治理", "反射与注解"],
+    "frontend": ["JavaScript", "HTML", "CSS"]
+  }
+}

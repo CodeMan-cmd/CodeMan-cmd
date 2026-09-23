@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>README 渲染预览（GitHub Markdown 约束模拟）</title>
+<!--
+  这个预览页刻意"模拟 GitHub 的渲染约束"，而不是用浏览器默认行为：
+    1. 不用 <style> 标签里被 GitHub 剥离的特性；
+    2. 不用内联事件属性（onclick/onerror）—— GitHub 会剥离，靠它兜底是无效的；
+    3. 宽度按 GitHub 内容区（约 1012px）限制，这样看到的就是真实观感；
+    4. <img> 统一 max-width:100%，与 GitHub 的默认样式一致。
+  目的：在推送之前就能看出"有没有坏图、有没有排版塌掉"。
+-->
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; padding: 0;
+    background: #0d1117; color: #e6edf3;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.6;
+  }
+  .page { max-width: 1012px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* 顶部提示：这是离线预览，不是 GitHub 真身 */
+  .notice {
+    border: 1px solid #d29922; border-left-width: 4px; border-radius: 6px;
+    background: #2d2305; padding: 12px 16px; margin-bottom: 26px; font-size: 14px;
+  }
+  .notice b { color: #e3b341; }
+
+  /* 模拟 GitHub markdown body 的样式 */
+  .markdown-body h1, .markdown-body h2 { border-bottom: 1px solid #30363d; padding-bottom: .3em; }
+  .markdown-body h2 { font-size: 1.5em; margin-top: 34px; }
+  .markdown-body img { max-width: 100%; box-sizing: content-box; background: transparent; }
+  .markdown-body a { color: #58a6ff; text-decoration: none; }
+  .markdown-body a:hover { text-decoration: underline; }
+  .markdown-body table { border-collapse: collapse; width: 100%; margin: 16px 0; display: block; overflow: auto; }
+  .markdown-body th, .markdown-body td { border: 1px solid #30363d; padding: 7px 13px; text-align: left; }
+  .markdown-body th { background: #161b22; font-weight: 600; }
+  .markdown-body tr:nth-child(2n) { background: #161b22; }
+  .markdown-body pre {
+    background: #161b22; border-radius: 6px; padding: 16px; overflow: auto;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; line-height: 1.45;
+  }
+  .markdown-body code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 85%; }
+  .markdown-body blockquote { border-left: 4px solid #30363d; color: #8b949e; margin: 0; padding: 0 1em; }
+  .markdown-body hr { border: 0; border-top: 1px solid #30363d; margin: 26px 0; }
+  .markdown-body div[align="center"] { text-align: center; }
+  .markdown-body sub { font-size: 12px; color: #8b949e; }
+
+  /* 坏图可视化：真实 GitHub 上不会显示这个边框，但破图标依然显眼 */
+  .markdown-body img:not([src$=".svg"]) { vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="notice">
+    <b>离线渲染预览</b> —— 以下是 README.md 在 GitHub 上的近似效果。图片为真实网络加载结果：
+    如果某处显示为破图标，说明该 URL 在你的网络下不可达，推送前必须替换。
+  </div>
+  <article class="markdown-body" id="content">正在加载 README.md…</article>
+</div>
+
+<script id="preview-renderer">
+// 用 fetch 读取同目录下的 README.md（需通过本地 http 服务打开，file:// 会被 CORS 拦）
+(async () => {
+  const el = document.getElementById('content');
+  try {
+    // README.md 位于仓库根目录，而本页在 preview/ 下，所以要向上一层取
+    const md = await (await fetch('../README.md', { cache: 'no-store' })).text();
+
+    // ── 极简 Markdown → HTML（够用即可：这份 README 用的语法有限） ──
+    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    function inline(s) {
+      // 先保护行内代码
+      const codes = [];
+      s = s.replace(/`([^`]+)`/g, (_, c) => `\u0000${codes.push(c) - 1}\u0000`);
+      s = esc(s);
+      s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, '<img src="$2" alt="$1">');
+      s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
+      s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+      s = s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${esc(codes[+i])}</code>`);
+      return s;
+    }
+
+    const lines = md.split(/\r?\n/);
+    let html = '';
+    let i = 0;
+    let inCode = false, codeLang = '', codeBuf = [];
+    let inComment = false; // ← 关键：HTML 注释必须整块吞掉
+
+    const flushCode = () => {
+      if (codeBuf.length) html += `<pre><code>${esc(codeBuf.join('\n'))}</code></pre>`;
+      codeBuf = []; codeLang = '';
+    };
+
+    while (i < lines.length) {
+      const line = lines[i];
+
+      // ── HTML 注释：必须整块透传 ──
+      // 踩过的坑：README 顶部有一段多行注释，若按普通文本逐行处理，
+      // 正文里那行 `───────` 会被包成 <p>，紧接着的 `-->` 就变成裸文本，
+      // 结果注释被提前截断，后面所有 HTML 块都失去配对、DOM 彻底错乱
+      // （表现是"图片一个都不渲染"）。所以这里做块级扫描。
+      if (inComment) {
+        html += line + '\n';
+        if (line.includes('-->')) inComment = false;
+        i++; continue;
+      }
+      if (/^\s*<!--/.test(line)) {
+        html += line + '\n';
+        if (!line.includes('-->')) inComment = true;
+        i++; continue;
+      }
+
+      // 代码围栏
+      const fence = line.match(/^```(\w*)/);
+      if (fence) {
+        if (inCode) { inCode = false; flushCode(); }
+        else { inCode = true; codeLang = fence[1]; }
+        i++; continue;
+      }
+      if (inCode) { codeBuf.push(line); i++; continue; }
+
+      // HTML 块（div / img / a / sub / picture / source …）—— 原样透传。
+      // 这里要包含 README 实际用到的全部标签，否则它们会被当成正文包进 <p>，
+      // 预览就会与 GitHub 的真实渲染不一致（例如双主题的 <picture> 会失效）。
+      // 注意：GitHub 会剥离 <style> 与内联事件属性，预览页也刻意不使用它们。
+      if (/^\s*<\/?(div|img|a|sub|sup|picture|source|br|b|i|strong|em|code|kbd|details|summary|table|tr|td|th|p)(\s|>|\/)/.test(line)) {
+        html += line + '\n';
+        i++; continue;
+      }
+
+      // 表格
+      if (line.includes('|') && lines[i + 1] && /^\s*\|?[\s:|-]+\|/.test(lines[i + 1]) && !line.trim().startsWith('<!--')) {
+        const cells = (l) => l.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map((c) => c.trim());
+        const head = cells(line);
+        i += 2;
+        let body = '';
+        while (i < lines.length && lines[i].includes('|')) {
+          body += '<tr>' + cells(lines[i]).map((c) => `<td>${inline(c)}</td>`).join('') + '</tr>';
+          i++;
+        }
+        html += `<table><thead><tr>${head.map((c) => `<th>${inline(c)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`;
+        continue;
+      }
+
+      // 标题
+      const h = line.match(/^(#{1,6})\s+(.*)$/);
+      if (h) { html += `<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`; i++; continue; }
+
+      // 分隔线
+      if (/^\s*---+\s*$/.test(line)) { html += '<hr>'; i++; continue; }
+
+      // 引用
+      if (/^\s*>\s?/.test(line)) { html += `<blockquote>${inline(line.replace(/^\s*>\s?/, ''))}</blockquote>`; i++; continue; }
+
+      // 列表
+      if (/^\s*[-*]\s+/.test(line)) {
+        let ul = '';
+        while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
+          ul += `<li>${inline(lines[i].replace(/^\s*[-*]\s+/, ''))}</li>`; i++;
+        }
+        html += `<ul>${ul}</ul>`;
+        continue;
+      }
+
+      if (line.trim() === '') { i++; continue; }
+
+      html += `<p>${inline(line)}</p>`;
+      i++;
+    }
+
+    // ── 相对路径校正 ──
+    // GitHub 上 README 位于仓库根目录，因此 `./assets/x.svg` 解析为 /assets/x.svg。
+    // 但本预览页在 preview/ 子目录下，浏览器会把同一路径解析成 /preview/assets/x.svg。
+    // 为如实还原 GitHub 的行为，这里把相对路径重写为以服务根为基准。
+    // 注意：这**只影响预览**，源文件里的写法必须保持相对路径，否则仓库里会失效。
+    html = html.replace(/(["'(])\.\/assets\//g, '$1/assets/');
+
+    el.innerHTML = html;
+
+    // ── 报告坏图 ──
+    // 用 getElementsByTagName 而非 querySelector：前者对标签名不区分大小写，
+    // 也不受选择器解析差异影响，结果更可靠。
+    const imgs = [...el.getElementsByTagName('img')];
+    const broken = [];
+    const check = (im) =>
+      new Promise((res) => {
+        if (im.complete) {
+          if (!im.naturalWidth) broken.push(im.getAttribute('src'));
+          return res();
+        }
+        let done = false;
+        const fin = () => { if (!done) { done = true; res(); } };
+        im.addEventListener('load', fin, { once: true });
+        im.addEventListener('error', () => { broken.push(im.getAttribute('src')); fin(); }, { once: true });
+        setTimeout(() => {
+          if (!im.naturalWidth) broken.push(im.getAttribute('src'));
+          fin();
+        }, 15000);
+      });
+    await Promise.all(imgs.map(check));
+
+    window.__PREVIEW_REPORT__ = {
+      imgTotal: imgs.length,
+      brokenCount: broken.length,
+      broken,
+      height: document.body.scrollHeight,
+      loadedBytes: imgs.reduce((a, im) => a + (im.naturalWidth > 0 ? 1 : 0), 0),
+    };
+    console.log('PREVIEW_REPORT ' + JSON.stringify(window.__PREVIEW_REPORT__));
+  } catch (e) {
+    el.textContent = '加载 README.md 失败：' + e.message + '（请通过 http 服务打开本页，不要用 file://）';
+  }
+})();
+</script>
+</body>
+</html>

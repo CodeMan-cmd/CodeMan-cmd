@@ -1,0 +1,35 @@
+# .gitattributes — 统一换行符，避免 git 反复提示 "LF will be replaced by CRLF"
+#
+# 为什么需要：
+#   Windows 上 core.autocrlf 默认为 true 时，git 会对每个文本文件发出
+#   "LF will be replaced by CRLF the next time Git touches it" 警告。
+#   这类警告无害，但在 PowerShell 脚本里会被当成 stderr 输出处理，
+#   配合 $ErrorActionPreference='Stop' 会让自动化脚本莫名中断。
+#   显式声明换行策略，既消除警告，也保证仓库内文件在不同平台上表现一致。
+#
+# 对 README 与 SVG 尤其重要：SVG 是 XML，换行符若被改写虽不影响解析，
+# 但会让每次 diff 都显示"整个文件变更"，失去可读性。
+
+# 默认：仓库内一律存 LF，检出时不转换
+* text=auto eol=lf
+
+# 这些是二进制，绝不做换行转换
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+
+# SVG 是文本（XML），强制 LF
+*.svg  text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.mjs  text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+
+# Windows 脚本保留 CRLF 更友好，但 PowerShell 5.1 对 UTF-8 BOM 更敏感，
+# 这里统一 LF，BOM 由脚本自身保证。
+*.ps1  text eol=lf
