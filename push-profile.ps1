@@ -26,6 +26,7 @@
 #                用途：把脚本指向本地裸仓库做**端到端自测**（连 push 一起验证），
 #                例如 -RemoteBase 'file:///C:/tmp' —— 这样无需 GitHub 凭据即可
 #                确认"提交 → 推送 → 校验"整条链路真的能跑通。
+#   -Branch      远端分支名，默认 master（与 CodeMan-cmd/CodeMan-cmd 的默认分支一致）
 
 [CmdletBinding()]
 param(
@@ -33,7 +34,8 @@ param(
     [switch]$SkipVerify,
     [string]$Message,
     [string]$User = 'CodeMan-cmd',
-    [string]$RemoteBase = 'https://github.com'
+    [string]$RemoteBase = 'https://github.com',
+    [string]$Branch = 'master'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -127,13 +129,13 @@ if (-not $SkipVerify) {
 # ── 3. 初始化仓库 ──
 Say '准备本地仓库' 'step'
 if (-not (Test-Path (Join-Path $Root '.git'))) {
-    $r = Invoke-Git @('init', '-b', 'main')
+    $r = Invoke-Git @('init', '-b', $Branch)
     if ($r.Code -ne 0) {
         # 老版本 git 不支持 -b
         Invoke-Git @('init') | Out-Null
-        Invoke-Git @('symbolic-ref', 'HEAD', 'refs/heads/main') | Out-Null
+        Invoke-Git @('symbolic-ref', 'HEAD', "refs/heads/$Branch") | Out-Null
     }
-    Say '已初始化 git 仓库（分支 main）' 'ok'
+    Say "已初始化 git 仓库（分支 $Branch）" 'ok'
 } else {
     Say '已存在 .git，复用' 'ok'
 }
@@ -226,7 +228,7 @@ Invoke-Git @('remote', 'add', 'origin', $pushUrl) | Out-Null
 # 为什么必须查：下面的失败回退会用到 --force，若远端存在本地缺失的提交
 # （例如你在网页上直接编辑过 README），强推会**无声地覆盖**那些改动。
 # 个人主页仓库通常只有自己在写，但"通常"不等于"一定"，所以先确认再动手。
-$remoteMain = Invoke-Git @('ls-remote', 'origin', 'refs/heads/main')
+$remoteMain = Invoke-Git @('ls-remote', 'origin', "refs/heads/$Branch")
 $remoteSha = ''
 if ($remoteMain.Code -eq 0 -and $remoteMain.Output -match '(?m)^([0-9a-f]{40})\s') {
     $remoteSha = $Matches[1]
@@ -234,24 +236,24 @@ if ($remoteMain.Code -eq 0 -and $remoteMain.Output -match '(?m)^([0-9a-f]{40})\s
 if ($remoteSha) {
     $localHas = Invoke-Git @('merge-base', '--is-ancestor', $remoteSha, 'HEAD')
     if ($localHas.Code -ne 0) {
-        Say '检测到远端 main 含有本地没有的提交——直接强推会覆盖它们。' 'err'
-        Say "远端 main = $remoteSha" 'info'
+        Say '检测到远端含有本地没有的提交——直接强推会覆盖它们。' 'err'
+        Say "远端 $Branch = $remoteSha" 'info'
         Say '请先执行以下命令把远端改动合并进来，再重新运行本脚本：' 'info'
-        Say '    git pull --rebase origin main' 'info'
+        Say "    git pull --rebase origin $Branch" 'info'
         Say '（若你确认远端那些提交可以丢弃，可手动执行 git push --force）' 'warn'
         if ($token) { Invoke-Git @('remote', 'set-url', 'origin', $remoteUrl) | Out-Null }
         exit 1
     }
-    Say '远端 main 是本地 HEAD 的祖先，可安全快进' 'ok'
+    Say '远端分支是本地 HEAD 的祖先，可安全快进' 'ok'
 } else {
-    Say '远端还没有 main 分支，将进行首次推送' 'ok'
+    Say "远端还没有 $Branch 分支，将进行首次推送" 'ok'
 }
 
 # 先尝试带租约的强推（能防住并发改动），失败再回退到普通强推
-$p = Invoke-Git @('push', '-u', 'origin', 'main', '--force-with-lease')
+$p = Invoke-Git @('push', '-u', 'origin', "$Branch", '--force-with-lease')
 if ($p.Code -ne 0) {
     Say '带租约推送未成功，改用首次推送策略' 'warn'
-    $p = Invoke-Git @('push', '-u', 'origin', 'main', '--force')
+    $p = Invoke-Git @('push', '-u', 'origin', "$Branch", '--force')
 }
 if ($p.Code -ne 0) {
     Say "推送失败：$($p.Output)" 'err'
