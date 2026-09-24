@@ -104,8 +104,8 @@ function buildContactCard() {
   const W = 1000;
   const rows = [
     { label: 'GitHub', value: `@${data.profile.login}`, dot: C.text },
-    { label: 'Email', value: 'claire_channel@qq.com', dot: C.text },
-    { label: 'WeChat', value: 'tongff_wechat', dot: C.text },
+    { label: 'Email / 邮箱', value: 'claire_channel@qq.com', dot: C.text },
+    { label: 'WeChat / 微信', value: 'tongff_wechat', dot: C.text },
   ];
 
   const TOP = 74;          // 首个渠道的基线
@@ -142,24 +142,48 @@ function buildContribCard() {
   //   · 只写实测数据；「已合并」与「待审核」严格分列，绝不合并成"贡献 N 个 PR"
   //   · star 数标注为项目热度而非本人成绩
   const rows = [
-    { label: '提交 Pull Request', value: String(pr.total), note: `上游已合并 ${pr.upstreamMerged} · 待审核 ${pr.upstreamOpen}`, accent: false },
-    { label: '提交 Issue', value: String(iss.total), note: `${iss.open} 个目前仍 open`, accent: false },
-    { label: '涉及上游项目', value: String(data.contributions.upstreamProjects.count), note: 'Hutool · Fesod · LangChain.js', accent: false },
-    { label: '项目热度（非本人成绩）', value: '', note: 'Hutool 30.3k★ · Fesod 6.2k★', accent: false },
+    {
+      label: '提交 Pull Request / Pull Requests',
+      value: String(pr.total),
+      note: `上游已合并 ${pr.upstreamMerged} · 待审核 ${pr.upstreamOpen}`,
+      noteEn: `merged upstream ${pr.upstreamMerged} · under review ${pr.upstreamOpen}`,
+    },
+    {
+      label: '提交 Issue / Issues',
+      value: String(iss.total),
+      note: `${iss.open} 个目前仍 open`,
+      noteEn: `${iss.open} still open`,
+    },
+    {
+      label: '涉及上游项目 / Upstream Projects',
+      value: String(data.contributions.upstreamProjects.count),
+      note: 'Hutool · Fesod · LangChain.js',
+      noteEn: '',
+    },
+    {
+      label: '项目热度（非本人成绩）/ Project Popularity (not mine)',
+      value: '',
+      note: 'Hutool 30.3k★ · Fesod 6.2k★',
+      noteEn: '',
+    },
   ];
 
   const TOP = 76;
-  const ROW_H = 46;
-  const H = TOP + rows.length * ROW_H + 22;
+  const ROW_H = 56;          // 双语标签多占一行，行距相应加大
+  const H = TOP + rows.length * ROW_H + 18;
 
   const items = rows
     .map((r, i) => {
       const y = TOP + i * ROW_H;
       const val = r.value
-        ? `<text x="${W - PAD}" y="${y + 4}" text-anchor="end" font-family="${FONT_SANS}" font-size="26" font-weight="600" fill="${C.text}">${esc(r.value)}</text>`
+        ? `<text x="${W - PAD}" y="${y + 2}" text-anchor="end" font-family="${FONT_SANS}" font-size="26" font-weight="600" fill="${C.text}">${esc(r.value)}</text>`
+        : '';
+      // 三行结构：中文标签 / 说明 / 英文说明（英文为空则这一行不画，避免留空）
+      const noteEn = r.noteEn
+        ? `\n  <text x="${PAD}" y="${y + 34}" font-family="${FONT_SANS}" font-size="10.5" fill="${C.faint}">${esc(r.noteEn)}</text>`
         : '';
       return `  <text x="${PAD}" y="${y}" font-family="${FONT_SANS}" font-size="13" fill="${C.text}">${esc(r.label)}</text>
-  <text x="${PAD}" y="${y + 18}" font-family="${FONT_SANS}" font-size="11.5" fill="${C.label}">${esc(r.note)}</text>
+  <text x="${PAD}" y="${y + 18}" font-family="${FONT_SANS}" font-size="11.5" fill="${C.label}">${esc(r.note)}</text>${noteEn}
 ${val}`;
     })
     .join('\n');

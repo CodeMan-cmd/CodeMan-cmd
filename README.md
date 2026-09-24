@@ -1,9 +1,10 @@
 <!--
   ═══════════════════════════════════════════════════════════════════════════
-  Claire · GitHub 个人主页
+  Claire · GitHub 个人主页　GitHub Profile
 
-  设计取向：极简。全页只回答四个问题 —— 我是谁、我在做什么、做出过什么、怎么找我。
-  没有技术栈清单、没有徽章墙、没有装饰性分区。
+  设计取向：极简 + 中英对照。全页只回答四个问题 ——
+  我是谁、我在做什么、做出过什么、怎么找我。
+  Minimal and bilingual. Four questions only: who / what / shipped / how to reach.
 
   ── 底线（改之前先读）──
     · 数字都要能查到出处，GitHub 数据来自 API 实测且可点链接复查；
@@ -22,7 +23,7 @@
       验证：preview/css-snake-verify.html
 
   ── 维护命令 ──
-    刷新贡献数据 + 重画贪吃蛇（提交后数据才会跟着变，SVG 是快照不会自动更新）：
+    刷新贡献数据 + 重画贪吃蛇（提交后数据才会变，SVG 是快照不会自动更新）：
         node tools/fetch-contributions.mjs && node tools/generate-snake.mjs
     重新渲染卡片   node tools/generate-assets.mjs
     上线前体检     node tools/verify-assets.mjs
@@ -34,19 +35,40 @@
 
 <p align="center">
   AI 应用开发 · 多 Agent 编排 · RAG<br>
-  <sub>6 年企业级开发经验（医疗 / 政务 / 制造）</sub>
+  <sub>AI Application Development · Multi-Agent Orchestration · RAG</sub>
+</p>
+
+<p align="center">
+  <sub>6 年企业级开发经验（医疗 / 政务 / 制造）<br>
+  6 years of enterprise development（Healthcare / GovTech / Manufacturing）</sub>
 </p>
 
 <br>
 
-### Hopeflow · AI 短剧创作平台
+### Hopeflow · AI 短剧创作平台（AI Short-Drama Platform）
 
-<sub>全栈独立开发 · <b>未开源</b>（可面谈演示）</sub>
+<sub>全栈独立开发 · <b>未开源</b>（可面谈演示）　Solo full-stack · <b>Not open source</b>（demo available）</sub>
 
-覆盖「小说 → 剧本 → 分镜 → 素材 → 视频」一站式创作链路。
+覆盖「小说 → 剧本 → 分镜 → 素材 → 视频」一站式创作链路。<br>
+<sub>An end-to-end pipeline: novel → script → storyboard → assets → video.</sub>
 
-- **三层 Agent 协作**：决策层 → 执行层 → 监督层编排，全自动与人工决策双模式
-- **本地向量 RAG**：ONNX 本地模型实现跨会话记忆与知识库检索，推理全链路本地化
+<br>
+
+<!-- 刻意不用「HTML 表格内嵌 Markdown」做双栏布局：
+     找了 10 个知名仓库（github/docs、public-apis、coding-interview-university 等），
+     没有任何一个用这种写法，无法验证 GitHub 是否解析 <td> 内的 Markdown。
+     改用纯 Markdown 的「粗体标题 + <sub> 英文」——这种写法在本项目的预览器与
+     GitHub 上都确定可靠。不确定性不该出现在主页上。 -->
+
+**三层 Agent 协作**
+决策层 → 执行层 → 监督层编排，全自动与人工决策双模式
+
+<sub>Three-layer agent orchestration — decision → execution → supervision, with fully-automatic and human-in-the-loop modes</sub>
+
+**本地向量 RAG**
+ONNX 本地模型实现跨会话记忆与知识库检索，推理全链路本地化
+
+<sub>Local vector RAG — ONNX-based cross-session memory and knowledge retrieval, fully local inference</sub>
 
 <br>
 
@@ -55,28 +77,30 @@
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="./assets/snake-light.svg">
-    <img src="./assets/snake.svg" alt="贡献图贪吃蛇动画" width="100%">
+    <img src="./assets/snake.svg" alt="贡献图贪吃蛇动画 Contribution graph snake" width="100%">
   </picture>
 </div>
 
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="./assets/contrib-light.svg">
-    <img src="./assets/contrib.svg" alt="开源贡献：15 个 PR、17 个 issue" width="100%">
+    <img src="./assets/contrib.svg" alt="开源贡献 Open source contributions" width="100%">
   </picture>
 </div>
 
 给 [Hutool](https://github.com/chinabugotech/hutool)（30.3k★）修的
-[#4337](https://github.com/chinabugotech/hutool/pull/4337) 已被合并；
-另有 8 个 PR 在 [apache/fesod](https://github.com/apache/fesod)（6.2k★）与 Hutool 待审核 ——
-<sub>[全部 PR](https://github.com/pulls?q=is%3Apr+author%3ACodeMan-cmd) · [全部 issue](https://github.com/issues?q=is%3Aissue+author%3ACodeMan-cmd)</sub>
+[#4337](https://github.com/chinabugotech/hutool/pull/4337) 已被合并；另有 8 个 PR 在
+[apache/fesod](https://github.com/apache/fesod)（6.2k★）与 Hutool 待审核。<br>
+<sub>One fix merged upstream in Hutool; 8 more PRs under review in apache/fesod and Hutool.</sub>
+
+<sub>[全部 PR / All PRs](https://github.com/pulls?q=is%3Apr+author%3ACodeMan-cmd) · [全部 issue / All issues](https://github.com/issues?q=is%3Aissue+author%3ACodeMan-cmd)</sub>
 
 <br>
 
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="./assets/contact-light.svg">
-    <img src="./assets/contact.svg" alt="联系方式：GitHub / Email / 微信" width="100%">
+    <img src="./assets/contact.svg" alt="联系方式 Contact：GitHub / Email / WeChat" width="100%">
   </picture>
 </div>
 
@@ -89,6 +113,6 @@
     &nbsp;&nbsp;·&nbsp;&nbsp;
     <a href="/CodeMan-cmd">github.com/CodeMan-cmd</a>
     &nbsp;&nbsp;·&nbsp;&nbsp;
-    微信 tongff_wechat
+    微信 WeChat tongff_wechat
   </sub>
 </div>
