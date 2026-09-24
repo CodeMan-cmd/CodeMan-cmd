@@ -76,7 +76,7 @@
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="./assets/contact-light.svg">
-    <img src="./assets/contact.svg" alt="联系方式：GitHub / Email / QQ" width="100%">
+    <img src="./assets/contact.svg" alt="联系方式：GitHub / Email / 微信" width="100%">
   </picture>
 </div>
 
@@ -89,6 +89,6 @@
     &nbsp;&nbsp;·&nbsp;&nbsp;
     <a href="/CodeMan-cmd">github.com/CodeMan-cmd</a>
     &nbsp;&nbsp;·&nbsp;&nbsp;
-    QQ 2291415248
+    微信 tongff_wechat
   </sub>
 </div>

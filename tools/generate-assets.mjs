@@ -105,7 +105,7 @@ function buildContactCard() {
   const rows = [
     { label: 'GitHub', value: `@${data.profile.login}`, dot: C.text },
     { label: 'Email', value: 'claire_channel@qq.com', dot: C.text },
-    { label: 'QQ', value: '2291415248', dot: C.text },
+    { label: 'WeChat', value: 'tongff_wechat', dot: C.text },
   ];
 
   const TOP = 74;          // 首个渠道的基线
