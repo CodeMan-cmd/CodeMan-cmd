@@ -83,7 +83,16 @@ Web 部署与 Electron 桌面客户端双形态交付。
 
 <!-- 贡献图贪吃蛇：蛇按列蛇形爬过最近 53 周的贡献格子，
      每吃掉一个"有贡献"的格子，那格会闪一下琥珀色再定成它的等级色。
-     纯 SMIL 实现（GitHub 会剥掉 SVG 里的 JS），所以不需要任何脚本。
+
+     实现用 CSS @keyframes（蛇身 stroke-dashoffset + 每格一条独立 keyframes），
+     路线与 Platane/snk（6k★，被大量主页使用）一致。
+
+     为什么不用 SMIL：GitHub 渲染仓库里的 SVG 走 <img> 语义，实测在
+     <object>/<img> 这类"单独加载"场景下，SMIL 版的 snake.svg 完全不动
+     （6 秒内填充色只有 1 种取值），而 CSS 版同场景下蛇身每帧都在变、
+     25/25 个格子动画生效。验证页：preview/css-snake-verify.html
+     教训：把 SVG 内联进 DOM 验证动画是**不可靠的**，必须按 <img> 语义验证。
+
      数据源为第三方镜像 github-contributions-api.jogruber.de（GitHub 官方
      贡献数据只走 GraphQL），刷新方式：node tools/fetch-contributions.mjs -->
 <div align="center">

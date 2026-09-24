@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>CSS 蛇 · 关键验证（object 语义）</title>
+<!--
+  验证目标：新的 CSS 版 snake.svg，在 <object>（≈ GitHub 的 <img> 语义）下
+  是否真的会动。这恰恰是 SMIL 版失败的地方，必须在这里过关。
+  判定方式：读取 SVG 内部元素的计算样式，看取值是否随时间变化。
+  同时区分两个层次：蛇身（.body / .head 的 stroke-dashoffset）与格子（.fNN 的 fill）。
+-->
+<style>body{margin:0;padding:14px;background:#0d1117;color:#e6edf3;font-family:monospace;font-size:12px}
+table{border-collapse:collapse;margin-top:10px}td,th{border:1px solid #30363d;padding:3px 9px}
+.ok{color:#3fb950}.bad{color:#ff7b72}
+.box{display:inline-block;margin:8px;outline:1px solid #30363d}</style>
+</head>
+<body>
+<p>在 <b>&lt;object&gt;</b> 下读取 SVG 内部计算样式。<b>这是 SMIL 版失败、CSS 版必须过关的场景。</b></p>
+<div id="stage"></div>
+<div id="out">载入中…</div>
+<script id="v">
+async function loadInto(src, w, h) {
+  const box = document.createElement('div');
+  box.className = 'box';
+  const obj = document.createElement('object');
+  obj.type = 'image/svg+xml'; obj.data = src; obj.width = w; obj.height = h;
+  box.appendChild(obj);
+  document.getElementById('stage').appendChild(box);
+  await new Promise((res) => { obj.addEventListener('load', res, { once: true }); setTimeout(res, 5000); });
+  return obj;
+}
+
+async function probe(obj, ms) {
+  const doc = obj.contentDocument;
+  if (!doc) return { err: '无法访问 contentDocument' };
+  const win = doc.defaultView;
+  const body = doc.querySelector('.body');
+  const head = doc.querySelector('.head');
+  const cells = [...doc.querySelectorAll('rect[class^="f"]')];
+  if (!body) return { err: '未找到 .body（蛇身）' };
+
+  const sBody = new Set(), sHead = new Set();
+  const sCells = cells.map(() => new Set());
+  const t0 = performance.now();
+  let frames = 0;
+  await new Promise((res) => {
+    const tick = () => {
+      sBody.add(win.getComputedStyle(body).strokeDashoffset);
+      if (head) sHead.add(win.getComputedStyle(head).strokeDashoffset);
+      cells.forEach((c, i) => sCells[i].add(win.getComputedStyle(c).fill));
+      frames++;
+      if (performance.now() - t0 < ms) requestAnimationFrame(tick); else res();
+    };
+    requestAnimationFrame(tick);
+  });
+
+  return {
+    frames,
+    bodyDistinct: sBody.size,
+    bodySample: [...sBody].slice(0, 3),
+    headDistinct: sHead.size,
+    cellsTotal: cells.length,
+    cellsAnimated: sCells.filter((s) => s.size > 1).length,
+    sampleCellDistinct: sCells[0] ? sCells[0].size : 0,
+  };
+}
+
+(async () => {
+  const SRC = new URLSearchParams(location.search).get('src') || '/preview/_snake-fast.svg';
+  const MS = parseInt(new URLSearchParams(location.search).get('ms') || '10000', 10);
+  const obj = await loadInto(SRC, 800, 220);
+  const r = await probe(obj, MS);
+  document.getElementById('out').innerHTML =
+    r.err ? `<b class="bad">${r.err}</b>` :
+    `<p>源：<b>${SRC}</b>，采样 ${r.frames} 帧 / ${MS}ms</p>` +
+    `<table>
+      <tr><th>对象</th><th>取值种数</th><th>判定</th><th>样本</th></tr>
+      <tr><td>蛇身 .body 的 stroke-dashoffset</td><td class="${r.bodyDistinct > 1 ? 'ok' : 'bad'}">${r.bodyDistinct}</td><td>${r.bodyDistinct > 1 ? '✔ 在移动' : '✘ 不动'}</td><td>${r.bodySample.join(' → ')}</td></tr>
+      <tr><td>蛇头 .head 的 stroke-dashoffset</td><td class="${r.headDistinct > 1 ? 'ok' : 'bad'}">${r.headDistinct}</td><td>${r.headDistinct > 1 ? '✔ 在移动' : '✘ 不动'}</td><td>-</td></tr>
+      <tr><td>格子闪烁（${r.cellsAnimated} / ${r.cellsTotal} 个在变）</td><td>${r.sampleCellDistinct}</td><td>${r.cellsAnimated > 0 ? '✔ 生效' : '✘ 未生效'}</td><td>-</td></tr>
+    </table>`;
+  window.__V__ = r;
+  console.log('V ' + JSON.stringify(r));
+})().catch((e) => { document.getElementById('out').textContent = 'ERR ' + e.message; console.log('V_ERR ' + e.message); });
+</script>
+</body>
+</html>
