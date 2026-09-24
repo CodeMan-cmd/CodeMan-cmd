@@ -20,7 +20,7 @@
     · 每张卡有深/浅两套，用 <picture> + prefers-color-scheme 自适应。
     · 贪吃蛇用 CSS @keyframes（与 Platane/snk 同路线）。**不能用 SMIL**：
       GitHub 渲染仓库 SVG 走 <img> 语义，实测 SMIL 版在该场景下完全不动。
-      验证：preview/css-snake-verify.html（需先 git checkout 该文件）
+      验证页：preview/css-snake-verify.html（用 <object> 载入，等同 <img> 语义）
     · 蛇是**静态快照**，不会自动更新；提交后要重跑下面两条命令才会长出新的格子。
 
   ── 维护命令 ──
