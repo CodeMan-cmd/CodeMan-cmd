@@ -58,8 +58,20 @@ function extract(md) {
     let m;
     while ((m = re.exec(md))) {
       const u = m[1].trim();
-      if (/^https?:\/\//i.test(u)) remote.add(u);
-      else if (!u.startsWith('#') && !u.startsWith('mailto:')) local.add(u.split('#')[0]);
+      if (/^https?:\/\//i.test(u)) {
+        remote.add(u);
+      } else if (
+        !u.startsWith('#') &&          // 页内锚点
+        !u.startsWith('mailto:')       // 邮件链接
+      ) {
+        // 站内绝对路径（以单个 / 开头）不是仓库内的文件，例如 <a href="/CodeMan-cmd">
+        // 在 GitHub 上会解析成 github.com/CodeMan-cmd。早先版本把它当成本地文件，
+        // 报"文件不存在"——典型的校验器误报，会让人去改本来正确的写法。
+        if (u.startsWith('/') && !u.startsWith('//')) continue;
+        // 纯外链协议（tel: 等）也跳过
+        if (/^[a-z][a-z0-9+.-]*:/i.test(u)) continue;
+        local.add(u.split('#')[0]);
+      }
     }
   }
   return { remote: [...remote], local: [...local] };

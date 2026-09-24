@@ -50,39 +50,80 @@
   "contributions": {
     "_comment": "上游开源贡献，均逐条核验（GET /search/issues?q=author:CodeMan-cmd&type=pr）。",
     "pullRequests": {
-      "_note": "截至 2026-09-23 的真实状态：5 个 open、0 个 merged。不得把 open 描述为已贡献/已接纳。",
-      "total": 8,
-      "open": 5,
-      "merged": 0,
+      "_note": "截至 2026-09-24 的真实状态。全部经 GET /search/issues?q=author:CodeMan-cmd&type=pr 逐条核验。区分 merged / open / closed：绝不可把 open 说成已贡献。",
+      "total": 15,
+      "merged": 4,
+      "open": 8,
       "closed": 3,
+      "_mergedNote": "其中只有 hutool #4337 是上游项目合并；另外 3 个 merged 是作者自己的个人主页仓库（CodeMan-cmd#1/#2/#3）。",
+      "upstreamMerged": 1,
+      "upstreamOpen": 8,
+      "byRepo": {
+        "chinabugotech/hutool": { "total": 5, "merged": 1, "open": 4, "closed": 0 },
+        "apache/fesod": { "total": 3, "merged": 0, "open": 3, "closed": 0 },
+        "langchain-ai/langchainjs": { "total": 1, "merged": 0, "open": 1, "closed": 0 },
+        "spring-projects/spring-framework": { "total": 1, "merged": 0, "open": 0, "closed": 1 },
+        "Azure/AKS": { "total": 1, "merged": 0, "open": 0, "closed": 1 },
+        "firstcontributions/first-contributions": { "total": 1, "merged": 1, "open": 0, "closed": 0 },
+        "CodeMan-cmd/CodeMan-cmd": { "total": 3, "merged": 3, "open": 0, "closed": 0 }
+      },
       "items": [
-        { "repo": "chinabugotech/hutool", "number": 4330, "title": "修复 FileMagicNumber 的 MP3/DOC matcher 对截断输入抛 ArrayIndexOutOfBoundsException", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/pull/4330" },
-        { "repo": "chinabugotech/hutool", "number": 4327, "title": "修复 Caesar.encode 负偏移量抛异常及非字母表字符被静默损坏", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/pull/4327" },
-        { "repo": "apache/fesod", "number": 1133, "title": "feat: add converters for java.sql.Date / java.sql.Time / java.time.Instant / java.time.YearMonth", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/apache/fesod/pull/1133" },
-        { "repo": "apache/fesod", "number": 1132, "title": "fix: keep the coordinates in a cloned ReadCellData", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/apache/fesod/pull/1132" },
-        { "repo": "apache/fesod", "number": 1130, "title": "fix: filter columns by java field name for camel case field names", "state": "open", "merged": false, "created": "2026-09-23", "url": "https://github.com/apache/fesod/pull/1130" },
-        { "repo": "spring-projects/spring-framework", "number": 29223, "title": "Optimization Determine Bean Name From Annotation", "state": "closed", "merged": false, "created": "2022-09-30", "url": "https://github.com/spring-projects/spring-framework/pull/29223" },
-        { "repo": "Azure/AKS", "number": 2973, "title": "Pahealy/2022 05 01 fix", "state": "closed", "merged": false, "created": "2022-05-22", "url": "https://github.com/Azure/AKS/pull/2973" },
-        { "repo": "firstcontributions/first-contributions", "number": 49850, "title": "add tonghuihuang to Contributors list", "state": "merged", "merged": true, "created": "2022-05-22", "url": "https://github.com/firstcontributions/first-contributions/pull/49850" }
+        { "repo": "chinabugotech/hutool", "number": 4337, "title": "修复 CharSequenceUtil.replaceFirst 在含增补字符时替换位置错误", "state": "merged", "merged": true, "upstream": true, "created": "2026-09-23", "comments": 1, "url": "https://github.com/chinabugotech/hutool/pull/4337" },
+        { "repo": "langchain-ai/langchainjs", "number": 11703, "title": "test(textsplitters): pin the chunkOverlap contract across separator boundaries", "state": "open", "merged": false, "upstream": true, "created": "2026-09-23", "comments": 2, "url": "https://github.com/langchain-ai/langchainjs/pull/11703" },
+        { "repo": "chinabugotech/hutool", "number": 4335, "title": "修复 CRC16 校验值随数据喂入方式变化（6 个实现的 update/最终异或位置有误）", "state": "open", "merged": false, "upstream": true, "created": "2026-09-23", "comments": 1, "url": "https://github.com/chinabugotech/hutool/pull/4335" },
+        { "repo": "chinabugotech/hutool", "number": 4333, "title": "修复 Convert.toInstant 转换目标类型写错、Map 转 LocalDateTime 纳秒取错字段", "state": "open", "merged": false, "upstream": true, "created": "2026-09-23", "comments": 1, "url": "https://github.com/chinabugotech/hutool/pull/4333" },
+        { "repo": "chinabugotech/hutool", "number": 4330, "title": "修复 FileMagicNumber 的 MP3/DOC matcher 对截断输入抛 ArrayIndexOutOfBoundsException", "state": "open", "merged": false, "upstream": true, "created": "2026-09-23", "comments": 1, "url": "https://github.com/chinabugotech/hutool/pull/4330" },
+        { "repo": "chinabugotech/hutool", "number": 4327, "title": "修复 Caesar.encode 负偏移量抛异常及非字母表字符被静默损坏", "state": "open", "merged": false, "upstream": true, "created": "2026-09-23", "comments": 1, "url": "https://github.com/chinabugotech/hutool/pull/4327" },
+        { "repo": "apache/fesod", "number": 1133, "title": "feat: add converters for java.sql.Date / java.sql.Time / java.time.Instant / java.time.YearMonth", "state": "open", "merged": false, "upstream": true, "created": "2026-09-23", "comments": 0, "url": "https://github.com/apache/fesod/pull/1133" },
+        { "repo": "apache/fesod", "number": 1132, "title": "fix: keep the coordinates in a cloned ReadCellData", "state": "open", "merged": false, "upstream": true, "created": "2026-09-23", "comments": 0, "url": "https://github.com/apache/fesod/pull/1132" },
+        { "repo": "apache/fesod", "number": 1130, "title": "fix: filter columns by java field name for camel case field names", "state": "open", "merged": false, "upstream": true, "created": "2026-09-23", "comments": 0, "url": "https://github.com/apache/fesod/pull/1130" },
+        { "repo": "spring-projects/spring-framework", "number": 29223, "title": "Optimization Determine Bean Name From Annotation", "state": "closed", "merged": false, "upstream": true, "created": "2022-09-30", "comments": 8, "url": "https://github.com/spring-projects/spring-framework/pull/29223" },
+        { "repo": "Azure/AKS", "number": 2973, "title": "Pahealy/2022 05 01 fix", "state": "closed", "merged": false, "upstream": true, "created": "2022-05-22", "comments": 4, "url": "https://github.com/Azure/AKS/pull/2973" },
+        { "repo": "firstcontributions/first-contributions", "number": 49850, "title": "add tonghuihuang to Contributors list", "state": "merged", "merged": true, "upstream": true, "created": "2022-05-22", "comments": 1, "url": "https://github.com/firstcontributions/first-contributions/pull/49850" }
       ]
     },
     "issues": [
-      { "repo": "chinabugotech/hutool", "number": 4329, "title": "FileMagicNumber 的 MP3 / DOC matcher 对截断输入抛出 ArrayIndexOutOfBoundsException（重复）", "state": "closed", "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4329" },
-      { "repo": "chinabugotech/hutool", "number": 4328, "title": "FileMagicNumber 的 MP3 / DOC matcher 对截断输入抛出 ArrayIndexOutOfBoundsException", "state": "open", "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4328" },
-      { "repo": "chinabugotech/hutool", "number": 4326, "title": "Caesar.encode() 传入负偏移量抛出 StringIndexOutOfBoundsException，且中文等非字母表字符被静默损坏", "state": "open", "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4326" },
-      { "repo": "apache/fesod", "number": 1131, "title": "[Bug] A cell read into a ReadCellData field loses its row and column index", "state": "open", "created": "2026-09-23", "url": "https://github.com/apache/fesod/issues/1131" },
-      { "repo": "apache/fesod", "number": 1129, "title": "[Bug] Column include/exclude drops or keeps the wrong columns for field names like xRealIp", "state": "open", "created": "2026-09-23", "url": "https://github.com/apache/fesod/issues/1129" }
+      { "repo": "langchain-ai/langchainjs", "number": 11702, "title": "chunkOverlap is silently lost when a chunk exactly fills chunkSize", "state": "open", "upstream": true, "created": "2026-09-23", "url": "https://github.com/langchain-ai/langchainjs/issues/11702" },
+      { "repo": "chinabugotech/hutool", "number": 4336, "title": "CharSequenceUtil.replaceFirst 在含增补字符（emoji）的字符串中替换位置错误", "state": "closed", "upstream": true, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4336" },
+      { "repo": "chinabugotech/hutool", "number": 4334, "title": "CRC16 校验值随数据喂入方式变化（流式读取会算出错误校验值）", "state": "open", "upstream": true, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4334" },
+      { "repo": "chinabugotech/hutool", "number": 4332, "title": "Map 转 LocalDateTime 时纳秒取错了字段（取了 second）", "state": "open", "upstream": true, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4332" },
+      { "repo": "chinabugotech/hutool", "number": 4331, "title": "Convert.toInstant 对所有非 null 输入都不可用（defaultValue 为 null 时抛异常）", "state": "open", "upstream": true, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4331" },
+      { "repo": "chinabugotech/hutool", "number": 4329, "title": "FileMagicNumber 的 MP3 / DOC matcher 对截断输入抛出 ArrayIndexOutOfBoundsException（重复）", "state": "closed", "upstream": true, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4329" },
+      { "repo": "chinabugotech/hutool", "number": 4328, "title": "FileMagicNumber 的 MP3 / DOC matcher 对截断输入抛出 ArrayIndexOutOfBoundsException", "state": "open", "upstream": true, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4328" },
+      { "repo": "chinabugotech/hutool", "number": 4326, "title": "Caesar.encode() 传入负偏移量抛出 StringIndexOutOfBoundsException，且中文等非字母表字符被静默损坏", "state": "open", "upstream": true, "created": "2026-09-23", "url": "https://github.com/chinabugotech/hutool/issues/4326" },
+      { "repo": "apache/fesod", "number": 1131, "title": "[Bug] A cell read into a ReadCellData field loses its row and column index", "state": "open", "upstream": true, "created": "2026-09-23", "url": "https://github.com/apache/fesod/issues/1131" },
+      { "repo": "apache/fesod", "number": 1129, "title": "[Bug] Column include/exclude drops or keeps the wrong columns for field names like xRealIp", "state": "open", "upstream": true, "created": "2026-09-23", "url": "https://github.com/apache/fesod/issues/1129" }
     ],
     "issuesLifetime": {
-      "_note": "含历史 issue，总数 12（2022-05 ~ 2026-09）。",
-      "total": 12,
-      "todayOpen": 4
+      "_note": "含历史 issue，总数 17（2022-05 ~ 2026-09）。其中 open 8 个。",
+      "total": 17,
+      "open": 8,
+      "byRepo": {
+        "chinabugotech/hutool": { "total": 9, "open": 5, "closed": 4 },
+        "apache/fesod": { "total": 2, "open": 2, "closed": 0 },
+        "langchain-ai/langchainjs": { "total": 1, "open": 1, "closed": 0 },
+        "spring-projects/spring-framework": { "total": 1, "open": 0, "closed": 1 },
+        "xiaoymin/knife4j": { "total": 1, "open": 0, "closed": 1 },
+        "lanomw/TampermonkeyScript": { "total": 2, "open": 0, "closed": 2 },
+        "bbossgroups/elasticsearch-example": { "total": 1, "open": 0, "closed": 1 }
+      }
+    },
+    "upstreamProjects": {
+      "_note": "star/fork 为 GitHub API 实测值（2026-09-24）。",
+      "count": 7,
+      "highlights": [
+        { "repo": "chinabugotech/hutool", "stars": 30270, "forks": 7569, "lang": "Java" },
+        { "repo": "apache/fesod", "stars": 6243, "forks": 534, "lang": "Java" },
+        { "repo": "langchain-ai/langchainjs", "stars": null, "forks": null, "lang": "TypeScript", "note": "未取 star 数（未实测，留空而非估算）" },
+        { "repo": "spring-projects/spring-framework", "stars": null, "forks": null, "lang": "Java", "note": "未取 star 数" }
+      ]
     },
     "upstreams": [
-      { "repo": "apache/fesod", "full": "Apache Fesod", "what": "高性能电子表格读写库（Apache 项目）；已提交 3 个待审 PR", "url": "https://github.com/apache/fesod" },
-      { "repo": "chinabugotech/hutool", "full": "Hutool", "what": "Java 工具类库；已提交 2 个待审 PR 与 2 个缺陷报告", "url": "https://github.com/chinabugotech/hutool" },
-      { "repo": "alibaba/easyexcel", "full": "EasyExcel", "what": "大文件内存友好的 Excel 处理库；Fork 跟进", "url": "https://github.com/alibaba/easyexcel" },
-      { "repo": "spring-projects/spring-framework", "full": "Spring Framework", "what": "2022 年提过从注解推导 Bean 名称的优化（已关闭）", "url": "https://github.com/spring-projects/spring-framework" }
+      { "repo": "apache/fesod", "full": "Apache Fesod", "stars": 6243, "what": "高性能电子表格读写库（Apache 项目）", "url": "https://github.com/apache/fesod" },
+      { "repo": "chinabugotech/hutool", "full": "Hutool", "stars": 30270, "what": "Java 工具类库；已有 1 个修复被合并，另有 4 个待审核", "url": "https://github.com/chinabugotech/hutool" },
+      { "repo": "langchain-ai/langchainjs", "full": "LangChain.js", "stars": null, "what": "文本切分（text splitters）的 chunkOverlap 边界契约；1 个 PR 与 1 个 issue 在审", "url": "https://github.com/langchain-ai/langchainjs" },
+      { "repo": "alibaba/easyexcel", "full": "EasyExcel", "stars": null, "what": "大文件内存友好的 Excel 处理库；Fork 跟进", "url": "https://github.com/alibaba/easyexcel" },
+      { "repo": "spring-projects/spring-framework", "full": "Spring Framework", "stars": null, "what": "2022 年提过从注解推导 Bean 名称的优化（已关闭）", "url": "https://github.com/spring-projects/spring-framework" }
     ]
   },
   "activity": {

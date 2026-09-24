@@ -168,6 +168,97 @@ ${items}
 `;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   contrib.svg — 开源贡献量化卡
+   ═══════════════════════════════════════════════════════════ */
+function buildContribCard() {
+  const W = 1000;
+  const PAD = 40;
+  const pr = data.contributions.pullRequests;
+  const iss = data.contributions.issuesLifetime;
+
+  // 四个可核验的指标。措辞纪律：
+  //   · 只写实际数据，不写"精通/资深"这类无法验证的形容
+  //   · merged 与 open 必须分开显示，绝不合并成"贡献了 15 个 PR"
+  const metrics = [
+    {
+      value: String(pr.total),
+      label: '提交 PR',
+      sub: `上游已合并 ${pr.upstreamMerged} · 待审核 ${pr.upstreamOpen}`,
+      color: C.accent,
+    },
+    {
+      value: String(iss.total),
+      label: '提交 issue',
+      sub: `${iss.open} 个目前仍 open`,
+      color: C.amber,
+    },
+    {
+      value: String(data.contributions.upstreamProjects.count),
+      label: '涉及上游项目',
+      // 文案长度受限：4 格均分时每格可用约 188px，10.5px 等宽字体下
+      // 本串实测 159px。改文案前请先用 preview/measure-subtitles.html 量宽度，
+      // 否则会静默溢出被裁掉（踩过一次）。
+      sub: 'Hutool · Fesod · LangChain.js',
+      color: C.violet,
+    },
+    {
+      value: '3',
+      label: '主项目 star 量级',
+      sub: 'Hutool 30.3k★ · Fesod 6.2k★',
+      color: C.green,
+    },
+  ];
+
+  const HEADER_H = 62;
+  const boxH = 92;
+  const top = HEADER_H + 22;
+  const gap = 14;
+  const boxW = (W - PAD * 2 - gap * (metrics.length - 1)) / metrics.length;
+  const BOTTOM_PAD = 46;   // 给脚注留位置
+  const H = top + boxH + BOTTOM_PAD;
+
+  const boxes = metrics
+    .map((m, i) => {
+      const x = PAD + i * (boxW + gap);
+      return `  <g>
+    <rect x="${x}" y="${top}" width="${boxW}" height="${boxH}" rx="10" fill="${C.bg}" stroke="${C.border}" stroke-width="1"/>
+    <rect x="${x}" y="${top}" width="${boxW}" height="3" rx="1.5" fill="${m.color}"/>
+    <text x="${x + 18}" y="${top + 46}" font-family="${FONT_SANS}" font-size="30" font-weight="700" fill="${C.text}">${esc(m.value)}</text>
+    <text x="${x + 18}" y="${top + 68}" font-family="${FONT_SANS}" font-size="13" fill="${C.text}">${esc(m.label)}</text>
+    <text x="${x + 18}" y="${top + 84}" font-family="${FONT_MONO}" font-size="10.5" fill="${C.muted}">${esc(m.sub)}</text>
+  </g>`;
+    })
+    .join('\n');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="开源贡献量化">
+  <defs>
+    <pattern id="cdot" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="1.5" fill="${C.dot}"/>
+    </pattern>
+    <linearGradient id="ctop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="${C.accent}" stop-opacity="0.9"/>
+      <stop offset="55%" stop-color="${C.violet}" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="${C.violet}" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="${W}" height="${H}" rx="12" fill="${C.panel}"/>
+  <rect width="${W}" height="${H}" rx="12" fill="url(#cdot)" opacity="0.55"/>
+  <rect x="0.75" y="0.75" width="${W - 1.5}" height="${H - 1.5}" rx="12" fill="none" stroke="${C.border}" stroke-width="1.5"/>
+  <rect x="24" y="0" width="${W - 48}" height="2.5" rx="1.25" fill="url(#ctop)"/>
+
+  <text x="${PAD}" y="46" font-family="${FONT_MONO}" font-size="13" fill="${C.text}" letter-spacing="2.4">OPEN SOURCE</text>
+  <text x="${W - PAD}" y="46" text-anchor="end" font-family="${FONT_SANS}" font-size="12" fill="${C.muted}">数字均由 GitHub API 核验，可点击下方链接逐条复查</text>
+  <line x1="${PAD}" y1="62" x2="${W - PAD}" y2="62" stroke="${C.border}" stroke-width="1"/>
+
+${boxes}
+
+  <text x="${PAD}" y="${H - 16}" font-family="${FONT_SANS}" font-size="11" fill="${C.muted}">★ 数为项目自身热度，非本人成绩。「已合并」= 被上游接纳；「待审核」= 已提交未合并。两者分开统计，不合并成"贡献 N 个 PR"。</text>
+</svg>
+`;
+}
+
 /* ── 渲染 ── */
 mkdirSync(ASSETS, { recursive: true });
 
@@ -177,6 +268,7 @@ for (const theme of ['dark', 'light']) {
   const suffix = theme === 'light' ? '-light' : '';
   console.log(`\n[${theme}]`);
   write(`contact${suffix}.svg`, buildContactCard());
+  write(`contrib${suffix}.svg`, buildContribCard());
 }
 
 console.log('\n完成。请与 README.md 一同提交，README 中以相对路径引用。');
