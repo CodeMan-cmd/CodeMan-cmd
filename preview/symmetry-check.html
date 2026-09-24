@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>卡片对称性/对齐审计</title>
+<!--
+  目的：找出卡片里"不对称"的具体位置，用测量数据说话而不是凭感觉。
+  检查项：
+    ① 每个文本块相对整张卡的居中情况（左右留白是否相等）
+    ② 同一行内元素的垂直基线是否对齐
+    ③ 元素之间的横向间距是否一致
+    ④ 卡片整体是否居中
+-->
+<style>body{margin:0;padding:14px;background:#0d1117;color:#e6edf3;font-family:ui-monospace,monospace;font-size:12px}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #30363d;padding:2px 8px}
+.warn{color:#e3b341}.ok{color:#3fb950}.bad{color:#ff7b72}</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="out">分析中…</div>
+<script id="sym">
+const FILES = ['contact.svg', 'contrib.svg'];
+
+function analyze(svg, name) {
+  const vb = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+  const [vx, vy, vw, vh] = vb;
+  const out = { name, canvas: `${vw}×${vh}`, textLefts: [], issues: [] };
+
+  // 收集所有可见元素（text + rect + circle）的包围盒
+  const els = [...svg.querySelectorAll('text, rect, circle')].filter((e) => {
+    const t = e.tagName.toLowerCase();
+    if (t === 'text') return (e.textContent || '').trim().length > 0;
+    return true;
+  });
+
+  const boxes = els.map((e) => {
+    let b;
+    try { b = e.getBBox(); } catch { return null; }
+    return {
+      tag: e.tagName.toLowerCase(),
+      text: (e.textContent || '').trim().slice(0, 26),
+      x: b.x, y: b.y, w: b.width, h: b.height,
+      anchor: e.getAttribute && e.getAttribute('text-anchor'),
+    };
+  }).filter(Boolean);
+
+  // ① 卡片整体填充：是否有元素触及左/右边缘，判断"内容区"是否对称
+  const leftGap = Math.min(...boxes.map((b) => b.x)) - vx;
+  const rightGap = vx + vw - Math.max(...boxes.map((b) => b.x + b.w));
+  out.contentLeftGap = +leftGap.toFixed(1);
+  out.contentRightGap = +rightGap.toFixed(1);
+  out.symmetricMargins = Math.abs(leftGap - rightGap) < 2;
+  if (!out.symmetricMargins) {
+    out.issues.push(`左右留白不等：左 ${leftGap.toFixed(1)}px vs 右 ${rightGap.toFixed(1)}px（差 ${Math.abs(leftGap - rightGap).toFixed(1)}px）`);
+  }
+
+  // ② 按"行"分组（y 中心接近的算一行），检查行内基线是否对齐
+  const texts = boxes.filter((b) => b.tag === 'text');
+  const rowsMap = new Map();
+  texts.forEach((t) => {
+    const key = Math.round(t.y / 8);
+    if (!rowsMap.has(key)) rowsMap.set(key, []);
+    rowsMap.get(key).push(t);
+  });
+  out.rowGroups = rowsMap.size;
+
+  // ③ 检查所有 text 的左边界是否落在同一套栅格上
+  const lefts = [...new Set(texts.map((t) => +t.x.toFixed(0)))].sort((a, b) => a - b);
+  out.distinctTextLefts = lefts;
+
+  // ④ 数字/数值类元素（右对齐的）是否贴合右边距
+  const rightAligned = boxes.filter((b) => b.anchor === 'end');
+  out.rightAlignedRightEdges = rightAligned.map((b) => +(b.x + b.w).toFixed(1));
+  const rightPadExpected = vx + vw - rightAligned[0]?.x - rightAligned[0]?.w;
+  if (rightAligned.length) {
+    const pads = rightAligned.map((b) => +(vx + vw - (b.x + b.w)).toFixed(1));
+    const uniq = [...new Set(pads)];
+    out.rightPads = uniq;
+    if (uniq.length > 1) {
+      out.issues.push(`右对齐元素的右边距不一致：${uniq.join(' / ')}px`);
+    }
+  }
+
+  // ⑤ 顶部标题与首个内容行的间距，与底部留白是否协调
+  const titleBox = boxes.find((b) => b.tag === 'text');
+  out.topPad = titleBox ? +(titleBox.y - vy).toFixed(1) : null;
+  out.bottomPad = +(vy + vh - Math.max(...boxes.map((b) => b.y + b.h))).toFixed(1);
+
+  return out;
+}
+
+(async () => {
+  const root = document.getElementById('root');
+  const reports = [];
+  for (const f of FILES) {
+    const txt = await (await fetch('/assets/' + f, { cache: 'no-store' })).text();
+    const holder = document.createElement('div');
+    holder.style.cssText = 'position:absolute;left:-9999px';
+    holder.innerHTML = txt;
+    document.body.appendChild(holder);
+    const svg = holder.querySelector('svg');
+    reports.push(analyze(svg, f));
+    holder.remove();
+  }
+
+  let html = '';
+  for (const r of reports) {
+    html += `<h3>${r.name}　画布 ${r.canvas}</h3>`;
+    html += `<table>
+      <tr><th>左留白</th><th>右留白</th><th>是否对称</th><th>上留白(标题)</th><th>下留白</th></tr>
+      <tr><td>${r.contentLeftGap}px</td><td>${r.contentRightGap}px</td>
+          <td class="${r.symmetricMargins ? 'ok' : 'bad'}">${r.symmetricMargins ? '✔' : '✘'}</td>
+          <td>${r.topPad}px</td><td>${r.bottomPad}px</td></tr>
+    </table>`;
+    html += `<div>文本左边界的取值：<code>${r.distinctTextLefts.join(', ')}</code></div>`;
+    if (r.rightPads) html += `<div>右对齐元素右边距：<code>${r.rightPads.join(', ')}</code></div>`;
+    if (r.issues.length) {
+      html += `<ul>` + r.issues.map((i) => `<li class="warn">${i}</li>`).join('') + `</ul>`;
+    } else {
+      html += `<p class="ok">未发现明显不对称</p>`;
+    }
+  }
+  document.getElementById('out').innerHTML = html;
+  window.__SYM__ = reports;
+  console.log('SYM ' + JSON.stringify(reports));
+})().catch((e) => { document.getElementById('out').textContent = 'ERR ' + e.message; console.log('SYM_ERR ' + e.message); });
+</script>
+</body>
+</html>

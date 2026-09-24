@@ -105,6 +105,29 @@ function checkSvgWellFormed(text) {
   if (!/^\s*<svg[\s>]/i.test(text.replace(/^<\?xml[^>]*\?>\s*/, ''))) errs.push('根元素不是 <svg>');
   if (!/<\/svg>\s*$/i.test(text)) errs.push('缺少闭合的 </svg>');
 
+  /* ── 重复属性检查（这条是血泪教训）──
+     XML 里同一元素出现两个同名属性是**致命错误**，整个文档解析失败。
+     踩过的实例：生成器的文本辅助函数已硬编码 font-family，调用时又通过
+     参数追加了一个，产出 <text font-family="A" ... font-family="B">，
+     结果联系卡在浏览器里 naturalWidth=0 —— 整张图变成坏图，
+     而当时的校验器只做标签配对，**完全没抓到这个错误**。
+     注：属性名大小写敏感（SVG 里 fontSize 与 font-size 是不同属性，
+     且 camelCase 的那些本就不是合法 SVG 属性），故按原样比较。 */
+  const attrRe = /<([A-Za-z][\w:-]*)((?:\s+[^\s"'>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'>]+))?)*)\s*\/?>/g;
+  let am;
+  while ((am = attrRe.exec(text))) {
+    const tag = am[1];
+    const attrStr = am[2] || '';
+    const names = [...attrStr.matchAll(/(?:^|\s)([^\s"'>\/=]+)\s*=/g)].map((x) => x[1]);
+    const seen = new Set();
+    const dupes = new Set();
+    for (const n of names) {
+      if (seen.has(n)) dupes.add(n);
+      seen.add(n);
+    }
+    if (dupes.size) errs.push(`<${tag}> 有重复属性：${[...dupes].join(', ')}（XML 致命错误，会导致整图无法解析）`);
+  }
+
   // 标签配对检查。
   // 关键细节：不能预设某些元素"永远是自闭合"。例如 <rect> / <circle> 通常写成
   // <rect ... />，但只要它们内部嵌了动画子元素（<animate>），就**必须**写成

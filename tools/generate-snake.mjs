@@ -166,9 +166,13 @@ function buildSnake(theme) {
   <path class="head" d="${d}"/>
 
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Noto Sans, Helvetica, Arial, sans-serif" font-size="10.5" fill="${T.muted}">
+    <!-- 图例左右边界与卡片内容边界对齐：文字贴 x=PAD，方块紧接其后 ——
+         早先把方块放在 PAD+20，导致图例与标题的左边界差 20px，看着不齐。 -->
     <text x="${PAD}" y="${H - 14}">少</text>
-${[0, 1, 2, 3].map((i) => `    <rect x="${PAD + 20 + i * (CELL + 3)}" y="${H - 24}" width="${CELL}" height="${CELL}" rx="2.5" fill="${T.levels[i]}"/>`).join('\n')}
-    <text x="${PAD + 20 + 4 * (CELL + 3) + 2}" y="${H - 14}">多</text>
+    <g transform="translate(${PAD + 18})">
+${[0, 1, 2, 3].map((i) => `      <rect x="${i * (CELL + 3)}" y="${H - 24}" width="${CELL}" height="${CELL}" rx="2.5" fill="${T.levels[i]}"/>`).join('\n')}
+    </g>
+    <text x="${PAD + 18 + 4 * (CELL + 3) + 4}" y="${H - 14}">多</text>
   </g>
 </svg>
 `;

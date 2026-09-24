@@ -3,30 +3,33 @@
  * generate-assets.mjs — 离线渲染个人主页的静态 SVG 卡片
  *
  * ══════════════════════════════════════════════════════════════════════════
- * 设计原则：克制，但要有质感
+ * 布局栅格（改之前必读 —— 这版就是为了修"到处都是不对称"而重写的）
  * ══════════════════════════════════════════════════════════════════════════
- * 上一版卡片"显得廉价"，问题不在配色而在**装饰过量**。这一版逐条去掉：
- *   ✗ 背景点阵纹理      —— 纯装饰、零信息量，是模板感的头号来源
- *   ✗ 每格 drop-shadow  —— 到处发光是"科技感"的廉价替代品
- *   ✗ 左侧彩色竖条      —— 一个元素只该承担一件事，颜色留给有信息的位置
- *   ✗ 图标外加方框      —— 元素层数越多越吵
- *   ✗ 满屏分隔线        —— 分隔线是排版无力的表现
+ * 上一版的对齐缺陷（实测坐标，不是感觉）：
+ *   · 联系卡三条左边界不齐：标题 x=32、色点 x=35、标签与值 x=50
+ *   · 贡献卡行距不匀：56 / 56 / 62
+ *   · 同一张卡内 标签→值 的间距不一致：第 1 行 20px，后两行 24px
+ *   · 数值右边缘亚像素不齐：968 / 968.1
  *
- * 换成靠**留白与字号层级**建立秩序：
- *   · 大量呼吸空间，元素之间靠间距而非线条区分
- *   · 字号阶梯明确：标签 11px / 正文 13px / 数值 30px
- *   · 颜色只用于"有信息"的地方（联系渠道区分、贡献等级）
- *   · 唯一一条发丝线（顶部 1px 渐隐），作为收束而非分割
+ * 本版统一规则（所有卡片共用，不允许例外）：
+ *   1. 内容区左右边界恒为 [PAD, W - PAD]，PAD = 32
+ *   2. 所有左对齐文本（标题 / 标签 / 说明）一律 x = PAD —— 一条竖线贯穿全卡
+ *   3. 所有数值一律 text-anchor="end" 且 x = W - PAD —— 与右边距严丝合缝
+ *   4. 色点统一 cx = PAD + 3，不再是游离的第二条竖线
+ *   5. 行内节奏固定：标签 baseline 0 → 中文说明 +18 → 英文说明 +34
+ *   6. 行间距常量 ROW_GAP = 30（不再按"有没有英文"变来变去）
+ *   7. 上下留白对称：标题 baseline 40，底部留白 = 36
+ *   8. 唯一一条装饰线是顶部 1px 渐隐发丝线，x 从 PAD 到 W-PAD
  *
  * ══════════════════════════════════════════════════════════════════════════
- * 为什么自己渲染而不用第三方卡片服务
+ * 其他设计约定
  * ══════════════════════════════════════════════════════════════════════════
- * 实测本机 *.vercel.app 的 DNS 被污染（github-readme-stats、github-profile-trophy、
- * capsule-render、activity-graph 全部不可达），写进 README 就是坏图。
- * 自渲染静态 SVG：零第三方依赖、不受速率限制、网络再差也不会变破图。
- *
- * 双主题：每张卡渲染两份（深色 + `-light` 后缀），README 用
- * <picture> + prefers-color-scheme 按访客主题切换。
+ *   · 不用背景点阵、不用 drop-shadow、不用彩色竖条、不用图标方框 ——
+ *     这些装饰是"模板感"的来源，靠留白与字号层级建立秩序。
+ *   · 不用第三方卡片服务：实测本机 *.vercel.app 的 DNS 被污染
+ *     （github-readme-stats 等四个热门服务全不可达），写进 README 就是坏图。
+ *   · 双主题：每张卡渲染两份（深色 + `-light`），README 用
+ *     <picture> + prefers-color-scheme 按访客主题切换。
  *
  * 用法：node tools/generate-assets.mjs
  */
@@ -40,17 +43,14 @@ const ROOT = resolve(__dirname, '..');
 const ASSETS = resolve(ROOT, 'assets');
 const data = JSON.parse(readFileSync(resolve(ROOT, 'data', 'profile-data.json'), 'utf8'));
 
-/* ────────────────────── 设计令牌 ──────────────────────
-   两张卡共用，保证观感一致：同样的圆角、同样的发丝线、同样的字号阶梯。 */
+/* ── 设计令牌 ── */
 const THEMES = {
   dark: {
-    panel: '#0d1117',       // 与 GitHub 深色底一致，卡片无缝融入页面
-    hairline: '#21262d',    // 发丝线（不用亮边框，避免"描边卡片"感）
+    panel: '#0d1117',
+    hairline: '#21262d',
     text: '#e6edf3',
-    label: '#7d8590',       // 次级文字
-    faint: '#484f58',       // 三级文字
-    levels: ['#0e4429', '#006d32', '#26a641', '#39d353'],
-    rank: ['#8b949e', '#8b949e', '#c9a227'],  // 三级配色：克制，只给 top1 一点金
+    label: '#7d8590',
+    faint: '#484f58',
   },
   light: {
     panel: '#ffffff',
@@ -58,15 +58,26 @@ const THEMES = {
     text: '#1f2328',
     label: '#59636e',
     faint: '#8c959f',
-    levels: ['#9be9a8', '#40c463', '#30a14e', '#216e39'],
-    rank: ['#8c959f', '#8c959f', '#9a6700'],
   },
 };
 
 let C = THEMES.dark;
+
 const FONT_MONO = "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace";
 const FONT_SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif";
-const PAD = 32;               // 统一内边距
+
+/* ── 栅格常量：全卡共用，改这里就全改 ── */
+const PAD = 32;          // 内容区左右边距
+const W = 1000;          // 卡片宽度
+const TITLE_Y = 40;      // 标题 baseline
+const BOTTOM_PAD = 36;   // 底部留白（与顶部对称）
+const ROW_GAP = 30;      // 行与行之间的间距
+const NOTE_DY = 18;      // 标签 → 中文说明
+const NOTE_EN_DY = 34;   // 标签 → 英文说明
+const LABEL_SIZE = 13;
+const NOTE_SIZE = 11.5;
+const NOTE_EN_SIZE = 10.5;
+const VALUE_SIZE = 26;
 
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
@@ -77,8 +88,27 @@ function write(name, svg) {
   console.log(`  ✓ assets/${name}  (${(Buffer.byteLength(svg, 'utf8') / 1024).toFixed(1)} KB)`);
 }
 
-/** 卡片外壳：纯色底 + 一圈极淡描边 + 顶部一条渐隐发丝线。没有纹理、没有阴影。 */
-function cardShell(W, H, uid) {
+/** 左对齐文本（标题 / 标签 / 说明），一律贴 x = PAD。
+ *  注意：font 必须作为参数传入，不能在 extra 里再写一遍 font-family ——
+ *  XML 里重复属性是致命错误，会让整个 SVG 解析失败（踩过：联系卡因此变成坏图，
+ *  浏览器报 naturalWidth=0）。 */
+function textLeft(y, size, fill, content, font = FONT_SANS, extra = '') {
+  return `  <text x="${PAD}" y="${y}" font-family="${font}" font-size="${size}" fill="${fill}"${extra}>${esc(content)}</text>`;
+}
+/** 等宽小标题（卡片眉标） */
+function eyebrow(y, content) {
+  return `  <text x="${PAD}" y="${y}" font-family="${FONT_MONO}" font-size="11" fill="${C.label}" letter-spacing="3">${esc(content)}</text>`;
+}
+/** 右对齐数值，贴 x = W - PAD */
+function valueRight(y, content) {
+  return `  <text x="${W - PAD}" y="${y}" text-anchor="end" font-family="${FONT_SANS}" font-size="${VALUE_SIZE}" font-weight="600" fill="${C.text}">${esc(content)}</text>`;
+}
+/** 色点：统一 cx = PAD + 3，不再形成第二条竖线 */
+function dot(y) {
+  return `  <circle cx="${PAD + 3}" cy="${y - 4}" r="2.5" fill="${C.text}" opacity="0.55"/>`;
+}
+/** 卡片外壳：纯色底 + 极淡描边 + 顶部渐隐发丝线 */
+function shell(H, uid) {
   return {
     open: `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">
   <defs>
@@ -97,102 +127,95 @@ function cardShell(W, H, uid) {
 
 /* ═══════════════════════════════════════════════════════════
    contact.svg — 联系方式
-   排版思路：不用图标方框和色条，靠"标签在上、值在下"的纵向节奏，
-   加一点极小的色点做渠道区分 —— 一个色点承担全部识别成本。
    ═══════════════════════════════════════════════════════════ */
 function buildContactCard() {
-  const W = 1000;
   const rows = [
-    { label: 'GitHub', value: `@${data.profile.login}`, dot: C.text },
-    { label: 'Email / 邮箱', value: 'claire_channel@qq.com', dot: C.text },
-    { label: 'WeChat / 微信', value: 'tongff_wechat', dot: C.text },
+    { label: 'GitHub', value: `@${data.profile.login}` },
+    { label: 'Email / 邮箱', value: 'claire_channel@qq.com' },
+    { label: 'WeChat / 微信', value: 'tongff_wechat' },
   ];
 
-  const TOP = 74;          // 首个渠道的基线
-  const ROW_H = 62;        // 行距（大留白是"高级感"的主要来源）
-  const H = TOP + rows.length * ROW_H + 16;
+  const FIRST_Y = 76;
+  const ROW_H = 48;      // 两行结构（标签 + 值）的固定行高
+  const H = FIRST_Y + (rows.length - 1) * ROW_H + 26 + BOTTOM_PAD;
 
   const items = rows
     .map((r, i) => {
-      const y = TOP + i * ROW_H;
-      return `  <circle cx="${PAD + 3}" cy="${y - 4}" r="2.5" fill="${r.dot}" opacity="0.55"/>
-  <text x="${PAD + 18}" y="${y}" font-family="${FONT_MONO}" font-size="10.5" fill="${C.faint}" letter-spacing="1.6">${esc(r.label.toUpperCase())}</text>
-  <text x="${PAD + 18}" y="${y + 24}" font-family="${FONT_SANS}" font-size="15" fill="${C.text}">${esc(r.value)}</text>`;
+      const y = FIRST_Y + i * ROW_H;
+      return [
+        dot(y),
+        textLeft(y, 10.5, C.label, r.label.toUpperCase(), FONT_MONO, ' letter-spacing="1.6"'),
+        textLeft(y + 24, 15, C.text, r.value),
+      ].join('\n');
     })
     .join('\n');
 
-  const shell = cardShell(W, H, 'c');
-  return `${shell.open}
-  <text x="${PAD}" y="40" font-family="${FONT_MONO}" font-size="11" fill="${C.label}" letter-spacing="3">CONTACT</text>
+  const s = shell(H, 'c');
+  return `${s.open}
+${eyebrow(TITLE_Y, 'CONTACT')}
 ${items}
-${shell.close}`;
+${s.close}`;
 }
 
 /* ═══════════════════════════════════════════════════════════
    contrib.svg — 开源贡献
-   排版思路：数据表格化（标签左、数值右），不用指标格子。
-   格子会制造"仪表盘"感；表格更像一份可信的记录。
+   左列标签+说明，右列数值；行距恒定，不因有没有英文说明而变。
    ═══════════════════════════════════════════════════════════ */
 function buildContribCard() {
-  const W = 1000;
   const pr = data.contributions.pullRequests;
   const iss = data.contributions.issuesLifetime;
 
-  // 措辞纪律：
-  //   · 只写实测数据；「已合并」与「待审核」严格分列，绝不合并成"贡献 N 个 PR"
-  //   · star 数标注为项目热度而非本人成绩
+  // 措辞纪律：只写实测数据；「已合并」与「待审核」严格分列；
+  //           star 数标注为项目热度而非本人成绩。
   const rows = [
     {
       label: '提交 Pull Request / Pull Requests',
-      value: String(pr.total),
       note: `上游已合并 ${pr.upstreamMerged} · 待审核 ${pr.upstreamOpen}`,
       noteEn: `merged upstream ${pr.upstreamMerged} · under review ${pr.upstreamOpen}`,
+      value: String(pr.total),
     },
     {
       label: '提交 Issue / Issues',
-      value: String(iss.total),
       note: `${iss.open} 个目前仍 open`,
       noteEn: `${iss.open} still open`,
+      value: String(iss.total),
     },
     {
       label: '涉及上游项目 / Upstream Projects',
-      value: String(data.contributions.upstreamProjects.count),
       note: 'Hutool · Fesod · LangChain.js',
       noteEn: '',
+      value: String(data.contributions.upstreamProjects.count),
     },
     {
       label: '项目热度（非本人成绩）/ Project Popularity (not mine)',
-      value: '',
       note: 'Hutool 30.3k★ · Fesod 6.2k★',
       noteEn: '',
+      value: '',
     },
   ];
 
-  const TOP = 76;
-  const ROW_H = 56;          // 双语标签多占一行，行距相应加大
-  const H = TOP + rows.length * ROW_H + 18;
+  const FIRST_Y = 78;
+  // 行高恒定：留出"标签 + 中文说明 + 英文说明"三行的空间，
+  // 即使某行没有英文说明也占同样高度 —— 这样行距绝对均匀。
+  const ROW_H = 56;
+  const H = FIRST_Y + (rows.length - 1) * ROW_H + NOTE_EN_DY + 1 + BOTTOM_PAD - 18;
 
   const items = rows
     .map((r, i) => {
-      const y = TOP + i * ROW_H;
-      const val = r.value
-        ? `<text x="${W - PAD}" y="${y + 2}" text-anchor="end" font-family="${FONT_SANS}" font-size="26" font-weight="600" fill="${C.text}">${esc(r.value)}</text>`
-        : '';
-      // 三行结构：中文标签 / 说明 / 英文说明（英文为空则这一行不画，避免留空）
-      const noteEn = r.noteEn
-        ? `\n  <text x="${PAD}" y="${y + 34}" font-family="${FONT_SANS}" font-size="10.5" fill="${C.faint}">${esc(r.noteEn)}</text>`
-        : '';
-      return `  <text x="${PAD}" y="${y}" font-family="${FONT_SANS}" font-size="13" fill="${C.text}">${esc(r.label)}</text>
-  <text x="${PAD}" y="${y + 18}" font-family="${FONT_SANS}" font-size="11.5" fill="${C.label}">${esc(r.note)}</text>${noteEn}
-${val}`;
+      const y = FIRST_Y + i * ROW_H;
+      const lines = [textLeft(y, LABEL_SIZE, C.text, r.label)];
+      lines.push(textLeft(y + NOTE_DY, NOTE_SIZE, C.label, r.note));
+      if (r.noteEn) lines.push(textLeft(y + NOTE_EN_DY, NOTE_EN_SIZE, C.faint, r.noteEn));
+      if (r.value) lines.push(valueRight(y + 2, r.value));
+      return lines.join('\n');
     })
     .join('\n');
 
-  const shell = cardShell(W, H, 'o');
-  return `${shell.open}
-  <text x="${PAD}" y="40" font-family="${FONT_MONO}" font-size="11" fill="${C.label}" letter-spacing="3">OPEN SOURCE</text>
+  const s = shell(H, 'o');
+  return `${s.open}
+${eyebrow(TITLE_Y, 'OPEN SOURCE')}
 ${items}
-${shell.close}`;
+${s.close}`;
 }
 
 /* ── 渲染 ── */
