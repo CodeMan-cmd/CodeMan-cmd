@@ -160,7 +160,11 @@ function buildContactCard() {
 
   <!-- 标题 -->
   <text x="${PAD}" y="46" font-family="${FONT_MONO}" font-size="13" fill="${C.text}" letter-spacing="2.4">CONTACT</text>
-  <text x="${W - PAD}" y="46" text-anchor="end" font-family="${FONT_SANS}" font-size="12.5" fill="${C.muted}">欢迎交流 Java 与电子表格处理</text>
+  <!-- 副标题宽度实测量过（preview/measure-subtitles.html）：
+       本串 223px（旧串「欢迎交流 Java 与电子表格处理」168px）。
+       可用预算 = 960 − (40 + CONTACT 宽度 67 + 16 间隙) = 837px，余量充足。
+       改文案照旧先量，别凭感觉。 -->
+  <text x="${W - PAD}" y="46" text-anchor="end" font-family="${FONT_SANS}" font-size="12.5" fill="${C.muted}">欢迎交流 AI 应用、多 Agent 编排与 RAG</text>
   <line x1="${PAD}" y1="62" x2="${W - PAD}" y2="62" stroke="${C.border}" stroke-width="1"/>
 
 ${items}

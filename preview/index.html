@@ -124,11 +124,16 @@
       }
       if (inCode) { codeBuf.push(line); i++; continue; }
 
-      // HTML 块（div / img / a / sub / picture / source …）—— 原样透传。
+      // HTML 块（div / img / a / sub / picture / source / h1~h6 …）—— 原样透传。
       // 这里要包含 README 实际用到的全部标签，否则它们会被当成正文包进 <p>，
       // 预览就会与 GitHub 的真实渲染不一致（例如双主题的 <picture> 会失效）。
       // 注意：GitHub 会剥离 <style> 与内联事件属性，预览页也刻意不使用它们。
-      if (/^\s*<\/?(div|img|a|sub|sup|picture|source|br|b|i|strong|em|code|kbd|details|summary|table|tr|td|th|p)(\s|>|\/)/.test(line)) {
+      //
+      // 踩过的坑：白名单一度漏了 h1~h6，于是 `<h3 align="center">标题</h3>`
+      // 掉进下面的段落分支被转义，预览里显示成一串字面文本。GitHub 是允许
+      // h3 + align 的（个人主页标题的标准写法就在用），所以这是**预览撒谎**，
+      // 不是 README 有问题——差点因此把好端端的标题改坏。加标签别只想着 div/img。
+      if (/^\s*<\/?(h[1-6]|div|img|a|sub|sup|picture|source|br|b|i|strong|em|code|kbd|details|summary|table|tr|td|th|p)(\s|>|\/)/.test(line)) {
         html += line + '\n';
         i++; continue;
       }

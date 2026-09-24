@@ -18,7 +18,11 @@
 
   <!-- 标题 -->
   <text x="40" y="46" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" fill="#e6edf3" letter-spacing="2.4">CONTACT</text>
-  <text x="960" y="46" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="12.5" fill="#8b949e">欢迎交流 Java 与电子表格处理</text>
+  <!-- 副标题宽度实测量过（preview/measure-subtitles.html）：
+       本串 223px（旧串「欢迎交流 Java 与电子表格处理」168px）。
+       可用预算 = 960 − (40 + CONTACT 宽度 67 + 16 间隙) = 837px，余量充足。
+       改文案照旧先量，别凭感觉。 -->
+  <text x="960" y="46" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="12.5" fill="#8b949e">欢迎交流 AI 应用、多 Agent 编排与 RAG</text>
   <line x1="40" y1="62" x2="960" y2="62" stroke="#30363d" stroke-width="1"/>
 
   <g>

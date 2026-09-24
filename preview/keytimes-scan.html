@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>keyTimes 扫描</title>
+<style>body{margin:0;padding:14px;background:#0d1117;color:#e6edf3;font-family:monospace;font-size:12px}
+table{border-collapse:collapse;margin-top:8px}td,th{border:1px solid #30363d;padding:3px 9px}
+.ok{color:#3fb950}.bad{color:#ff7b72}</style>
+</head>
+<body>
+<p>固定 values 与 dur=3s，只改 keyTimes，扫描出到底哪些能用。每个采 4.2 秒（覆盖整轮）。</p>
+<div id="out">测试中…</div>
+<script id="scan">
+const KT = [
+  '0;0.5;1', '0;0.4;1', '0;0.3;1', '0;0.2;1', '0;0.1;1', '0;0.05;1',
+  '0;0.1;0.2', '0;0.2;0.4', '0;0.3;0.6', '0;0.5;0.6',
+  '0;0.1;0.2;1', '0;0.1;0.2;0.3',
+];
+
+async function testOne(kt) {
+  const host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-9999px';
+  host.innerHTML = `<svg width="64" height="64" viewBox="0 0 64 64">
+  <rect x="20" y="20" width="24" height="24" rx="2.5" fill="#161b22">
+    <animate attributeName="fill" values="#161b22;#ffb703;#0e4429" keyTimes="${kt}" dur="3s" repeatCount="indefinite"/>
+  </rect>
+</svg>`;
+  document.body.appendChild(host);
+  const rect = host.querySelector('rect');
+  const seen = new Set();
+  const t0 = performance.now();
+  await new Promise((res) => {
+    const tick = () => {
+      seen.add(getComputedStyle(rect).fill);
+      if (performance.now() - t0 < 4200) requestAnimationFrame(tick); else res();
+    };
+    requestAnimationFrame(tick);
+  });
+  host.remove();
+  return seen.size;
+}
+
+(async () => {
+  const rows = [];
+  for (const kt of KT) {
+    const n = await testOne(kt);
+    rows.push({ kt, n });
+    document.getElementById('out').innerHTML =
+      `<table><tr><th>keyTimes</th><th>颜色数</th><th>判定</th></tr>` +
+      rows.map((r) => `<tr><td>${r.kt}</td><td class="${r.n > 1 ? 'ok' : 'bad'}">${r.n}</td><td>${r.n > 1 ? '✔ 生效' : '✘ 不动'}</td></tr>`).join('') +
+      `</table>`;
+    window.__SCAN__ = rows;
+    console.log('SCAN ' + JSON.stringify(rows));
+  }
+})();
+</script>
+</body>
+</html>
