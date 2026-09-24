@@ -18,13 +18,8 @@
       实测本机 *.vercel.app 的 DNS 被污染（github-readme-stats 等四个热门服务全不可达），
       写进 README 就是坏图。自渲染零依赖、不受速率限制。
     · 每张卡有深/浅两套，用 <picture> + prefers-color-scheme 自适应。
-    · 贪吃蛇用 CSS @keyframes（与 Platane/snk 同路线）。**不能用 SMIL**：
-      GitHub 渲染仓库 SVG 走 <img> 语义，实测 SMIL 版在该场景下完全不动。
-      验证：preview/css-snake-verify.html
 
   ── 维护命令 ──
-    刷新贡献数据 + 重画贪吃蛇（提交后数据才会变，SVG 是快照不会自动更新）：
-        node tools/fetch-contributions.mjs && node tools/generate-snake.mjs
     重新渲染卡片   node tools/generate-assets.mjs
     上线前体检     node tools/verify-assets.mjs
     本地看效果     node tools/preview-server.mjs   → http://127.0.0.1:8123/
@@ -71,29 +66,6 @@ ONNX 本地模型实现跨会话记忆与知识库检索，推理全链路本地
 <sub>Local vector RAG — ONNX-based cross-session memory and knowledge retrieval, fully local inference</sub>
 
 <br>
-
-## Contributions
-
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: light)" srcset="./assets/snake-light.svg">
-    <img src="./assets/snake.svg" alt="贡献图贪吃蛇动画 Contribution graph snake" width="100%">
-  </picture>
-</div>
-
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: light)" srcset="./assets/contrib-light.svg">
-    <img src="./assets/contrib.svg" alt="开源贡献 Open source contributions" width="100%">
-  </picture>
-</div>
-
-给 [Hutool](https://github.com/chinabugotech/hutool)（30.3k★）修的
-[#4337](https://github.com/chinabugotech/hutool/pull/4337) 已被合并；另有 8 个 PR 在
-[apache/fesod](https://github.com/apache/fesod)（6.2k★）与 Hutool 待审核。<br>
-<sub>One fix merged upstream in Hutool; 8 more PRs under review in apache/fesod and Hutool.</sub>
-
-<sub>[全部 PR / All PRs](https://github.com/pulls?q=is%3Apr+author%3ACodeMan-cmd) · [全部 issue / All issues](https://github.com/issues?q=is%3Aissue+author%3ACodeMan-cmd)</sub>
 
 <br>
 

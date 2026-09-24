@@ -34,14 +34,13 @@
  * 用法：node tools/generate-assets.mjs
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const ASSETS = resolve(ROOT, 'assets');
-const data = JSON.parse(readFileSync(resolve(ROOT, 'data', 'profile-data.json'), 'utf8'));
 
 /* ── 设计令牌 ── */
 const THEMES = {
@@ -60,6 +59,11 @@ const THEMES = {
     faint: '#8c959f',
   },
 };
+
+// GitHub 登录名：联系卡要显示 @handle。
+// 原来从 data/profile-data.json 读取，但那份数据是给已下线的贡献卡用的，
+// 为一张卡保留整个数据文件不划算，改为常量。
+const LOGIN = 'CodeMan-cmd';
 
 let C = THEMES.dark;
 
@@ -130,7 +134,7 @@ function shell(H, uid) {
    ═══════════════════════════════════════════════════════════ */
 function buildContactCard() {
   const rows = [
-    { label: 'GitHub', value: `@${data.profile.login}` },
+    { label: 'GitHub', value: `@${LOGIN}` },
     { label: 'Email / 邮箱', value: 'claire_channel@qq.com' },
     { label: 'WeChat / 微信', value: 'tongff_wechat' },
   ];
@@ -157,67 +161,6 @@ ${items}
 ${s.close}`;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   contrib.svg — 开源贡献
-   左列标签+说明，右列数值；行距恒定，不因有没有英文说明而变。
-   ═══════════════════════════════════════════════════════════ */
-function buildContribCard() {
-  const pr = data.contributions.pullRequests;
-  const iss = data.contributions.issuesLifetime;
-
-  // 措辞纪律：只写实测数据；「已合并」与「待审核」严格分列；
-  //           star 数标注为项目热度而非本人成绩。
-  const rows = [
-    {
-      label: '提交 Pull Request / Pull Requests',
-      note: `上游已合并 ${pr.upstreamMerged} · 待审核 ${pr.upstreamOpen}`,
-      noteEn: `merged upstream ${pr.upstreamMerged} · under review ${pr.upstreamOpen}`,
-      value: String(pr.total),
-    },
-    {
-      label: '提交 Issue / Issues',
-      note: `${iss.open} 个目前仍 open`,
-      noteEn: `${iss.open} still open`,
-      value: String(iss.total),
-    },
-    {
-      label: '涉及上游项目 / Upstream Projects',
-      note: 'Hutool · Fesod · LangChain.js',
-      noteEn: '',
-      value: String(data.contributions.upstreamProjects.count),
-    },
-    {
-      label: '项目热度（非本人成绩）/ Project Popularity (not mine)',
-      note: 'Hutool 30.3k★ · Fesod 6.2k★',
-      noteEn: '',
-      value: '',
-    },
-  ];
-
-  const FIRST_Y = 78;
-  // 行高恒定：留出"标签 + 中文说明 + 英文说明"三行的空间，
-  // 即使某行没有英文说明也占同样高度 —— 这样行距绝对均匀。
-  const ROW_H = 56;
-  const H = FIRST_Y + (rows.length - 1) * ROW_H + NOTE_EN_DY + 1 + BOTTOM_PAD - 18;
-
-  const items = rows
-    .map((r, i) => {
-      const y = FIRST_Y + i * ROW_H;
-      const lines = [textLeft(y, LABEL_SIZE, C.text, r.label)];
-      lines.push(textLeft(y + NOTE_DY, NOTE_SIZE, C.label, r.note));
-      if (r.noteEn) lines.push(textLeft(y + NOTE_EN_DY, NOTE_EN_SIZE, C.faint, r.noteEn));
-      if (r.value) lines.push(valueRight(y + 2, r.value));
-      return lines.join('\n');
-    })
-    .join('\n');
-
-  const s = shell(H, 'o');
-  return `${s.open}
-${eyebrow(TITLE_Y, 'OPEN SOURCE')}
-${items}
-${s.close}`;
-}
-
 /* ── 渲染 ── */
 mkdirSync(ASSETS, { recursive: true });
 console.log('渲染静态 SVG（双主题）：');
@@ -226,6 +169,8 @@ for (const theme of ['dark', 'light']) {
   const suffix = theme === 'light' ? '-light' : '';
   console.log(`\n[${theme}]`);
   write(`contact${suffix}.svg`, buildContactCard());
-  write(`contrib${suffix}.svg`, buildContribCard());
+  // 说明：曾有一张「开源贡献」卡（contrib.svg）与配套的贪吃蛇动画，
+  // 因主页移除整个 Contributions 板块而一并退役 —— 其生成函数、产物、
+  // 数据文件（data/contributions.json）与生成脚本都已删除，不留死代码。
 }
 console.log('\n完成。请与 README.md 一同提交。');
