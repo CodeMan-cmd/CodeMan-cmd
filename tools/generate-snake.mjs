@@ -107,7 +107,7 @@ function buildSnake(theme) {
   const css = [];
   css.push(`.body{fill:none;stroke:${T.snake};stroke-width:${CELL - 3};stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:${tailPx} ${Math.max(1, pathLen - tailPx)};animation:crawl ${CYCLE_MS}ms linear infinite}`);
   css.push(`@keyframes crawl{from{stroke-dashoffset:${tailPx}}to{stroke-dashoffset:${-pathLen + tailPx}}}`);
-  css.push(`.head{fill:none;stroke:${T.glow};stroke-width:${CELL - 1};stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:${CELL} ${Math.max(1, pathLen - CELL)};animation:crawl ${CYCLE_MS}ms linear infinite;filter:drop-shadow(0 0 3px ${T.glow})}`);
+  css.push(`.head{fill:none;stroke:${T.glow};stroke-width:${CELL - 1};stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:${CELL} ${Math.max(1, pathLen - CELL)};animation:crawl ${CYCLE_MS}ms linear infinite}`);
 
   // 每个"有贡献"的格子：一条 keyframes，在蛇到达的时刻闪一下琥珀色再定成等级色
   const cells = [];

@@ -43,39 +43,26 @@
   ═══════════════════════════════════════════════════════════════════════════
 -->
 
-<h3 align="center">Rosemonder · AI 应用开发工程师</h3>
+<h3 align="center">Rosemonder</h3>
 
 <p align="center">
-  <b>多 Agent 编排 · RAG · 流式输出</b> —— 把大模型能力做成能跑完整业务闭环的产品，
-  底座是 5 年 Java 微服务与全栈工程经验。
-</p>
-
-<p align="center">
-  <code>TypeScript</code> <code>Node.js</code> <code>Java</code> <code>SpringCloud</code> <code>多 Agent 编排</code> <code>RAG</code> <code>Vercel AI SDK</code> <code>Vue 3</code>
+  AI 应用开发 · 多 Agent 编排 · RAG
 </p>
 
 <br>
 
-### 在做的东西 —— Hopeflow AI 短剧创作平台
+### Hopeflow · AI 短剧创作平台
 
-<sub>全栈独立开发 · <b>未开源</b>（可面谈演示）· 规模数字为本机统计，非 GitHub 可验证数据</sub>
+<sub>全栈独立开发 · <b>未开源</b>（可面谈演示）</sub>
 
-覆盖「小说 → 剧本 → 分镜 → 素材 → 视频」一站式创作链路，前后端分离 Monorepo，
-Web 部署与 Electron 桌面客户端双形态交付。
+覆盖「小说 → 剧本 → 分镜 → 素材 → 视频」一站式创作链路。
 
-- **三层 Agent 协作体系**：项目 / 剧本 / 生产三大 Agent 流水线接力，内部按
-  决策层 → 执行层 → 监督层编排，支持全自动无人值守与人工决策双模式，
-  输出经 Socket.IO 双向流式推送到前端。
-- **可编程供应商系统**：AI 供应商逻辑外化为 TypeScript 源码，Monaco 在线编辑、
-  sucrase 即时编译、`node:vm` 沙箱执行（原型链逃逸防护 + 编译缓存），
-  经 Vercel AI SDK 对接 OpenAI、DeepSeek、通义千问、MiniMax 等十余家模型供应商，
-  新增供应商按契约文件即插即用。
-- **本地向量 RAG**：基于 ONNX 本地模型实现 Agent 跨会话记忆（三通道检索 + 自动摘要）、
-  项目知识库检索与技能索引，**推理全链路本地化，无外部服务依赖**。
-- **无限画布工作台**：基于 VueFlow 用节点图组织剧本、分镜、素材与视频，
-  AI 输出 XML 流式解析驱动节点实时刷新，内置 webav 浏览器内轨道式视频合成与 mp4 导出。
+- **三层 Agent 协作**：决策层 → 执行层 → 监督层编排，支持全自动与人工决策双模式
+- **本地向量 RAG**：ONNX 本地模型实现 Agent 跨会话记忆与知识库检索，推理全链路本地化
+- **可编程供应商系统**：供应商逻辑外化为 TypeScript，沙箱执行，对接十余家模型供应商
+- **无限画布工作台**：节点图组织剧本与素材，浏览器内完成视频合成与导出
 
-<sub>工程规模：412 个源文件 · 6.8 万行 TypeScript · 202 条 REST 路由 · 31 张表 + 23 个查询索引 · 7 语言国际化</sub>
+<sub>412 个源文件 · 6.8 万行 TypeScript · 202 条 REST 路由 · 7 语言国际化</sub>
 
 <br>
 
@@ -112,41 +99,30 @@ Web 部署与 Electron 桌面客户端双形态交付。
 
 ### 为什么我会去修上游的 bug
 
-做 RAG 时踩到的坑，大多不在模型那一层，而在**摄取层的静默失败**：
-
-- 表格被按字数切碎，检索命中了但答案错
-- 单元格行列坐标在读取时丢失
-- chunk 刚好占满 chunkSize 时，overlap 被悄悄吞掉
-
+做 RAG 时踩到的坑，大多不在模型那一层，而在**摄取层的静默失败**：表格被按字数切碎、
+单元格行列坐标在读取时丢失、chunk 刚好占满 `chunkSize` 时 overlap 被悄悄吞掉。
 这些**都不抛异常**，只让结果慢慢变错，等发现时已经污染了整个知识库。
-所以修 bug 修到了上游去 —— 提交集中在这一类问题上：
+
+所以修 bug 修到了上游去：
 
 | 项目 | 内容 | 状态 |
 | :--- | :--- | :--- |
 | [**chinabugotech/hutool**](https://github.com/chinabugotech/hutool) · 30.3k★ | [#4337](https://github.com/chinabugotech/hutool/pull/4337) `CharSequenceUtil.replaceFirst` 在含增补字符（emoji）时替换位置错误 | ✅ 已合并 |
 | [**langchain-ai/langchainjs**](https://github.com/langchain-ai/langchainjs) | [#11702](https://github.com/langchain-ai/langchainjs/issues/11702) `chunkOverlap` 在 chunk 刚好占满 `chunkSize` 时被静默丢弃 | 🐞 issue |
-| | [#11703](https://github.com/langchain-ai/langchainjs/pull/11703) 为该边界契约补测试用例 | 🟡 待审核 |
-| [**apache/fesod**](https://github.com/apache/fesod) · 6.2k★ | [#1132](https://github.com/apache/fesod/pull/1132) 克隆 `ReadCellData` 时保留行列坐标 | 🟡 待审核 |
-| | [#1130](https://github.com/apache/fesod/pull/1130) 驼峰字段名（如 `xRealIp`）下的列筛选错选 | 🟡 待审核 |
-| | [#1133](https://github.com/apache/fesod/pull/1133) 补 `java.sql.Date` / `Instant` / `YearMonth` 等类型转换器 | 🟡 待审核 |
-| [**chinabugotech/hutool**](https://github.com/chinabugotech/hutool) | [#4335](https://github.com/chinabugotech/hutool/pull/4335) `CRC16` 校验值随数据喂入方式变化——**流式读取会算出错误校验值** | 🟡 待审核 |
-| | [#4327](https://github.com/chinabugotech/hutool/pull/4327) `Caesar.encode()` 负偏移量抛异常、非字母表字符被静默损坏 | 🟡 待审核 |
 
-<sub>完整清单见 [我的 PR](https://github.com/pulls?q=is%3Apr+author%3ACodeMan-cmd) 与 [我提的 issue](https://github.com/issues?q=is%3Aissue+author%3ACodeMan-cmd)。</sub>
+其余 8 个待审核 PR 涉及 [apache/fesod](https://github.com/apache/fesod)（6.2k★）的
+`ReadCellData` 坐标丢失、驼峰字段名筛选、类型转换器，以及 hutool 的 `CRC16` 流式校验、
+`Caesar.encode()` 负偏移量等问题 —— <sub>完整清单见 [我的 PR](https://github.com/pulls?q=is%3Apr+author%3ACodeMan-cmd) 与 [我提的 issue](https://github.com/issues?q=is%3Aissue+author%3ACodeMan-cmd)。</sub>
 
 <br>
 
-### 后端底座：5 年企业级系统
+### 后端底座
 
-做 AI 应用之前，我在医疗、政务、制造三个行业做过企业级后端：
+做 AI 应用之前，在医疗、政务、制造三个行业做过 5 年企业级后端：
 
-- **医疗** —— HIS 统一支付与对账平台：对接微信 / 支付宝 / 银联与多地医保，
-  实现 t+1 自动对账与差异处理；以及日志中台、多渠道消息推送平台
-  （短信 / 邮件 / 钉钉 / 公众号统一接入，多租户数据隔离，Elasticsearch 日志检索）。
-- **政务民生** —— 基层治理服务小程序：基于 Kafka 的校车实时定位与轨迹回放、
-  体检报告同步推送、政务事项全流程线上审批闭环。
-- **制造** —— 大宗商品集采平台：采购申请 → 采购订单 → 财务结算的数字化流转，
-  对接 ERP 完成货款与运费自动挂账。
+- **医疗** —— HIS 统一支付与对账平台（对接微信 / 支付宝 / 银联与多地医保，t+1 自动对账）
+- **政务** —— 基层治理服务小程序（Kafka 实时定位与轨迹回放、线上审批闭环）
+- **制造** —— 大宗商品集采平台（采购 → 订单 → 结算流转，对接 ERP 自动挂账）
 
 <sub>只说行业与系统类型，不写雇主与客户名称：公开主页上不替客户做披露。</sub>
 
@@ -162,14 +138,17 @@ Web 部署与 Electron 桌面客户端双形态交付。
 
 <br>
 
-<!-- 可点的联系方式。用原生文本而不是 shields.io 徽章：
-     实测徽章首次请求约需 1.6 秒，慢的时候页面会先闪出破图。 -->
+<!-- 卡片是图片、文字点不动，所以这里给一行真正可点的入口。
+     用原生文本而非 shields.io 徽章：实测徽章首次请求约需 1.6 秒，
+     慢的时候页面会先闪出破图。 -->
 <div align="center">
-  <a href="mailto:2291415248@qq.com"><code>2291415248@qq.com</code></a>
-  &nbsp;·&nbsp;
-  <a href="/CodeMan-cmd"><code>@CodeMan-cmd</code></a>
-  &nbsp;·&nbsp;
-  <code>QQ 2291415248</code>
+  <sub>
+    <a href="mailto:2291415248@qq.com">2291415248@qq.com</a>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    <a href="/CodeMan-cmd">github.com/CodeMan-cmd</a>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    QQ 2291415248
+  </sub>
 </div>
 
 <br>
