@@ -27,6 +27,12 @@
 #                例如 -RemoteBase 'file:///C:/tmp' —— 这样无需 GitHub 凭据即可
 #                确认"提交 → 推送 → 校验"整条链路真的能跑通。
 #   -Branch      远端分支名，默认 master（与 CodeMan-cmd/CodeMan-cmd 的默认分支一致）
+#   -AuthorName  git 提交作者名，默认 Claire（主页对外显示名）
+#   -AuthorEmail git 提交作者邮箱，默认 claire_channel@qq.com
+#
+# 注意：GitHub 登录名（$User）与 git 提交作者（$AuthorName）是**两回事**，
+# 早先版本共用一个 $User 变量，改名后会把登录名误写进提交作者，故拆开。
+# 作者邮箱必须与 GitHub 账号上的「已验证邮箱」一致，否则提交不计入贡献图。
 
 [CmdletBinding()]
 param(
@@ -35,7 +41,9 @@ param(
     [string]$Message,
     [string]$User = 'CodeMan-cmd',
     [string]$RemoteBase = 'https://github.com',
-    [string]$Branch = 'master'
+    [string]$Branch = 'master',
+    [string]$AuthorName = 'Claire',
+    [string]$AuthorEmail = 'claire_channel@qq.com'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -147,8 +155,8 @@ if (-not (Test-Path (Join-Path $Root '.git'))) {
     Say '已存在 .git，复用' 'ok'
 }
 
-Invoke-Git @('config', 'user.name', $User) | Out-Null
-Invoke-Git @('config', 'user.email', '2291415248@qq.com') | Out-Null
+Invoke-Git @('config', 'user.name', $AuthorName) | Out-Null
+Invoke-Git @('config', 'user.email', $AuthorEmail) | Out-Null
 
 # .gitignore：排除预览产物与本地数据快照中的噪音
 $ignore = Join-Path $Root '.gitignore'

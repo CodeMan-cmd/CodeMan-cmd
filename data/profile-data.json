@@ -5,7 +5,8 @@
   "profile": {
     "login": "CodeMan-cmd",
     "id": 52879329,
-    "name": "Rosemonder",
+    "_nameNote": "GitHub 账号上的 display name 原为 Rosemonder；主页对外显示名已统一为 Claire，这里同步，保持数据文件与页面一致。",
+    "name": "Claire",
     "type": "User",
     "company": null,
     "blog": "",

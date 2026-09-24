@@ -104,7 +104,7 @@ function buildContactCard() {
   const W = 1000;
   const rows = [
     { label: 'GitHub', value: `@${data.profile.login}`, dot: C.text },
-    { label: 'Email', value: '2291415248@qq.com', dot: C.text },
+    { label: 'Email', value: 'claire_channel@qq.com', dot: C.text },
     { label: 'QQ', value: '2291415248', dot: C.text },
   ];
 

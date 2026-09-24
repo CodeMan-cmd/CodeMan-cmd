@@ -43,7 +43,7 @@
   ═══════════════════════════════════════════════════════════════════════════
 -->
 
-<h3 align="center">Rosemonder</h3>
+<h3 align="center">Claire</h3>
 
 <p align="center">
   AI 应用开发 · 多 Agent 编排 · RAG
@@ -143,7 +143,7 @@
      慢的时候页面会先闪出破图。 -->
 <div align="center">
   <sub>
-    <a href="mailto:2291415248@qq.com">2291415248@qq.com</a>
+    <a href="mailto:claire_channel@qq.com">claire_channel@qq.com</a>
     &nbsp;&nbsp;·&nbsp;&nbsp;
     <a href="/CodeMan-cmd">github.com/CodeMan-cmd</a>
     &nbsp;&nbsp;·&nbsp;&nbsp;
