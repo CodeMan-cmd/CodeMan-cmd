@@ -18,11 +18,16 @@
       实测本机 *.vercel.app 的 DNS 被污染（github-readme-stats 等四个热门服务全不可达），
       写进 README 就是坏图。自渲染零依赖、不受速率限制。
     · 每张卡有深/浅两套，用 <picture> + prefers-color-scheme 自适应。
+    · 贪吃蛇用 CSS @keyframes（与 Platane/snk 同路线）。**不能用 SMIL**：
+      GitHub 渲染仓库 SVG 走 <img> 语义，实测 SMIL 版在该场景下完全不动。
+      验证：preview/css-snake-verify.html（需先 git checkout 该文件）
+    · 蛇是**静态快照**，不会自动更新；提交后要重跑下面两条命令才会长出新的格子。
 
   ── 维护命令 ──
-    重新渲染卡片   node tools/generate-assets.mjs
-    上线前体检     node tools/verify-assets.mjs
-    本地看效果     node tools/preview-server.mjs   → http://127.0.0.1:8123/
+    刷新贡献数据 + 重画贪吃蛇   node tools/fetch-contributions.mjs && node tools/generate-snake.mjs
+    重新渲染联系卡             node tools/generate-assets.mjs
+    上线前体检                 node tools/verify-assets.mjs
+    本地看效果                 node tools/preview-server.mjs   → http://127.0.0.1:8123/
   ═══════════════════════════════════════════════════════════════════════════
 -->
 
@@ -66,6 +71,15 @@ ONNX 本地模型实现跨会话记忆与知识库检索，推理全链路本地
 <sub>Local vector RAG — ONNX-based cross-session memory and knowledge retrieval, fully local inference</sub>
 
 <br>
+
+## Contributions
+
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="./assets/snake-light.svg">
+    <img src="./assets/snake.svg" alt="贡献图贪吃蛇动画 Contribution graph snake" width="100%">
+  </picture>
+</div>
 
 <br>
 

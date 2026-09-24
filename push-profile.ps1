@@ -110,7 +110,8 @@ Say "git: $((git --version))" 'ok'
 
 foreach ($f in @(
     'README.md',
-    'assets/contact.svg', 'assets/contact-light.svg'
+    'assets/contact.svg', 'assets/contact-light.svg',
+    'assets/snake.svg', 'assets/snake-light.svg'
 )) {
     if (-not (Test-Path (Join-Path $Root $f))) {
         Say "缺少文件 $f" 'err'
@@ -118,7 +119,7 @@ foreach ($f in @(
         exit 1
     }
 }
-Say 'README.md 与 2 个 SVG 资源齐全' 'ok'
+Say 'README.md 与 4 个 SVG 资源齐全' 'ok'
 
 # ── 2. 资产体检：有坏图就中止 ──
 if (-not $SkipVerify) {
