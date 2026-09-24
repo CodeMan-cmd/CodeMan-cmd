@@ -34,7 +34,7 @@
 
 <p align="center">
   AI 应用开发 · 多 Agent 编排 · RAG<br>
-  <sub>5 年企业级后端经验（医疗 / 政务 / 制造）</sub>
+  <sub>6 年企业级开发经验（医疗 / 政务 / 制造）</sub>
 </p>
 
 <br>

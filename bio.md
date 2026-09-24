@@ -26,7 +26,7 @@ GitHub 的 Bio 字段上限 **160 字符**（换行也算 1 个）。下面每�
 ```
 AI 应用开发工程师 · Agent 编排 / RAG / 流式输出
 独立开发 AI 短剧创作平台：三层 Agent 流水线 · 本地向量 RAG · 6.8 万行 TypeScript
-Java & Node.js 全栈 · 5 年 · SpringCloud / MySQL / Redis
+Java & Node.js 全栈 · 6 年 · SpringCloud / MySQL / Redis
 ```
 
 第三行是"底子"——说明你不只会调 API，是有后端功底的，这条对招人方很关键。
