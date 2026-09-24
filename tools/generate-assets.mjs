@@ -100,12 +100,13 @@ function renderTheme(theme) {
   write(`banner${suffix}.svg`, buildBanner());
   write(`stats${suffix}.svg`, buildStatsCard());
   write(`activity${suffix}.svg`, buildActivityCard());
-  write(`stack${suffix}.svg`, buildStackCard());
+  // 说明：曾有一张 "技术栈" 卡（stack.svg），因 README 移除该板块而退役，
+  // 其构建函数与产物一并删除——不留无人引用的资产和死代码。
 }
 
 mkdirSync(ASSETS, { recursive: true });
 
-const { profile, repoStats, contributions, activity, techStack } = data;
+const { profile, repoStats, contributions, activity } = data;
 
 /* ═══════════════════════════════════════════════════════════
    1. Banner — 保留原有的 CODE MAN 终端风格，做成渐变 + 扫描线
@@ -312,62 +313,6 @@ function buildActivityCard() {
   <line x1="34" y1="56" x2="${W - 34}" y2="56" stroke="${C.border}" stroke-width="1"/>
 
 ${bars}
-</svg>
-`;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   4. 技术栈卡 — 分类展示，避免"徽章墙"式堆砌
-   ═══════════════════════════════════════════════════════════ */
-function buildStackCard() {
-  const W = 1200;
-  const H = 232;
-
-  const groups = [
-    { title: 'LANGUAGES', items: techStack.core.slice(0, 4), color: C.accent },
-    { title: 'FRAMEWORKS & DATA', items: techStack.core.slice(4), color: C.violet },
-    { title: 'FOCUS', items: techStack.focus.slice(0, 3), color: C.amber },
-    { title: 'ALSO', items: [...techStack.focus.slice(3, 5), ...techStack.frontend.slice(0, 1)], color: C.cyan },
-  ];
-
-  const padX = 34;
-  const gap = 16;
-  const colW = (W - padX * 2 - gap * (groups.length - 1)) / groups.length;
-
-  const cols = groups
-    .map((g, gi) => {
-      const x = padX + gi * (colW + gap);
-      const chips = g.items
-        .map((it, ii) => {
-          const cy = 104 + ii * 34;
-          // 估算 chip 宽度：中文按 12px、ASCII 按 7px 计
-          let textW = 0;
-          for (const ch of it) textW += /[\u4e00-\u9fff]/.test(ch) ? 12 : 7;
-          const cw = Math.min(colW, textW + 28);
-          return `    <g>
-      <rect x="${x}" y="${cy}" width="${cw}" height="26" rx="6" fill="${C.panel2}" stroke="${g.color}" stroke-width="1" stroke-opacity="0.45"/>
-      <text x="${x + 13}" y="${cy + 17.5}" font-family="${FONT_MONO}" font-size="12" fill="${C.text}">${esc(it)}</text>
-    </g>`;
-        })
-        .join('\n');
-      return `  <g>
-    <text x="${x}" y="92" font-family="${FONT_MONO}" font-size="11.5" fill="${g.color}" letter-spacing="1.2">${esc(g.title)}</text>
-${chips}
-  </g>`;
-    })
-    .join('\n');
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="技术栈">
-  <rect width="${W}" height="${H}" rx="12" fill="${C.bg}" stroke="${C.border}" stroke-width="1.5"/>
-
-  <g>
-    <circle cx="40" cy="36" r="5.5" fill="${C.violet}"/>
-    <text x="58" y="41" font-family="${FONT_MONO}" font-size="13" fill="${C.text}" letter-spacing="1">TECH STACK</text>
-    <text x="${W - 34}" y="41" text-anchor="end" font-family="${FONT_MONO}" font-size="11.5" fill="${C.muted}">依据上游贡献与仓库语言归纳</text>
-  </g>
-  <line x1="34" y1="56" x2="${W - 34}" y2="56" stroke="${C.border}" stroke-width="1"/>
-
-${cols}
 </svg>
 `;
 }
