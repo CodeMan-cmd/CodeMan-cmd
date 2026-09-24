@@ -15,12 +15,39 @@
 <body style="margin:0;padding:16px;background:#222;color:#eee;font-family:monospace">
 <div id="root"></div>
 <script id="smil-checker">
-const FILES = [
+// 这些动画产物当前**未启用**（README 已改为极简设计）。
+// 要验证它们，先运行：node tools/generate-animated.mjs
+// 之所以做存在性探测，是因为文件不存在时 fetch 会拿到 404 的 HTML，
+// 解析出来是空 SVG 并报"动画数 0"，很容易被误读成"动画失效"。
+const CANDIDATES = [
   'anim-scan.svg', 'anim-glow.svg', 'anim-pulse.svg',
   'anim-scan-light.svg', 'anim-glow-light.svg', 'anim-pulse-light.svg',
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** 探测哪些动画文件真实存在且确实是 SVG */
+async function pickExisting() {
+  const found = [];
+  for (const f of CANDIDATES) {
+    try {
+      const r = await fetch('/assets/' + f, { method: 'GET', cache: 'no-store' });
+      const ct = r.headers.get('content-type') || '';
+      if (r.ok && ct.includes('svg')) found.push(f);
+    } catch {}
+  }
+  return found;
+}
+
+const FILES = await pickExisting();
+if (!FILES.length) {
+  document.getElementById('root').innerHTML =
+    '<p style="color:#e3b341">未找到任何动画文件（assets/anim-*.svg）。<br>' +
+    '这是预期状态：主页已改为极简设计，动画产物未启用。<br>' +
+    '如需验证动画能力，先运行 <code>node tools/generate-animated.mjs</code> 后刷新本页。</p>';
+  window.__SMIL_REPORT__ = { skipped: true, reason: 'assets 下没有任何 anim-*.svg（动画未启用）' };
+  console.log('SMIL_REPORT ' + JSON.stringify(window.__SMIL_REPORT__));
+}
 
 async function run() {
   const root = document.getElementById('root');
@@ -78,10 +105,15 @@ async function run() {
   console.log('SMIL_REPORT ' + JSON.stringify(report));
 }
 
-run().catch((e) => {
-  window.__SMIL_REPORT__ = { error: e.message };
-  console.log('SMIL_REPORT_ERROR ' + e.message);
-});
+// 只有真的存在动画文件时才跑验证。
+// 注意这里用 if 守卫而不是顶级 return —— 经典 <script> 里顶级 return 是语法错误，
+// 写上会让整段脚本静默不执行（控制台只报 SyntaxError，页面看着却"没反应"）。
+if (FILES.length) {
+  run().catch((e) => {
+    window.__SMIL_REPORT__ = { error: e.message };
+    console.log('SMIL_REPORT_ERROR ' + e.message);
+  });
+}
 </script>
 </body>
 </html>

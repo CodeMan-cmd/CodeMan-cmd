@@ -102,22 +102,15 @@ Say "git: $((git --version))" 'ok'
 
 foreach ($f in @(
     'README.md',
-    'assets/banner.svg',     'assets/banner-light.svg',
-    'assets/stats.svg',      'assets/stats-light.svg',
-    'assets/activity.svg',   'assets/activity-light.svg',
-    'assets/anim-scan.svg',  'assets/anim-scan-light.svg',
-    'assets/anim-glow.svg',  'assets/anim-glow-light.svg',
-    'assets/anim-pulse.svg', 'assets/anim-pulse-light.svg'
+    'assets/contact.svg', 'assets/contact-light.svg'
 )) {
     if (-not (Test-Path (Join-Path $Root $f))) {
         Say "缺少文件 $f" 'err'
-        Say '请依次运行：' 'info'
-        Say '    node tools/generate-assets.mjs' 'info'
-        Say '    node tools/generate-animated.mjs' 'info'
+        Say '请先运行：node tools/generate-assets.mjs' 'info'
         exit 1
     }
 }
-Say 'README.md 与 12 个 SVG 资源齐全' 'ok'
+Say 'README.md 与 2 个 SVG 资源齐全' 'ok'
 
 # ── 2. 资产体检：有坏图就中止 ──
 if (-not $SkipVerify) {
